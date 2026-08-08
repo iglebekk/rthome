@@ -1,7 +1,5 @@
 <?php
 
-test('the application returns a successful response', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
+test('the public entry point directs guests to sign in', function () {
+    $this->get('/')->assertRedirectToRoute('login');
 });

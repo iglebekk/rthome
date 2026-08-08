@@ -1,9 +1,29 @@
 @import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-brand-50: oklch(0.98 0.02 165);
+    --color-brand-600: oklch(0.53 0.13 164);
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(0.4rem); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@layer components {
+    .app-nav-link {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:text-zinc-300 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-200;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
 }

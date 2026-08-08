@@ -1,0 +1,67 @@
+<?php
+
+return [
+    'failed' => 'These credentials do not match our records.',
+    'password' => 'The provided password is incorrect.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'logout' => 'Sign out',
+    'identify' => [
+        'title' => 'Welcome',
+        'description' => 'Enter your email address to continue.',
+        'email' => 'Email address',
+        'submit' => 'Continue',
+    ],
+    'password_step' => [
+        'title' => 'Enter your password',
+        'description' => 'Sign in as :email.',
+        'password' => 'Password',
+        'remember' => 'Remember me',
+        'submit' => 'Sign in',
+        'different_email' => 'Use a different email',
+        'forgot' => 'Forgot your password?',
+    ],
+    'register' => [
+        'title' => 'Create your account',
+        'description' => 'Start with your details, then create your first club.',
+        'name' => 'Full name',
+        'email' => 'Email address',
+        'password' => 'Password',
+        'password_confirmation' => 'Confirm password',
+        'submit' => 'Create account',
+        'sign_in' => 'Already registered? Sign in',
+    ],
+    'activation' => [
+        'sent_title' => 'Check your inbox',
+        'sent_description' => 'We sent a secure activation link to :email. It is valid for 60 minutes.',
+        'title' => 'Activate your membership',
+        'description' => 'Choose your name and password to claim every matching club membership.',
+        'submit' => 'Activate account',
+        'completed' => 'Your member account is active.',
+        'email_subject' => 'Activate your club membership',
+        'email_intro' => 'A club has already added you as a member. Activate your account to get access.',
+        'email_action' => 'Activate account',
+        'email_expiry' => 'This secure link expires in 60 minutes and can only be used once.',
+    ],
+    'forgot' => [
+        'title' => 'Reset your password',
+        'description' => 'We will email you a secure password reset link.',
+        'submit' => 'Send reset link',
+        'back' => 'Back to sign in',
+    ],
+    'reset' => [
+        'title' => 'Choose a new password',
+        'description' => 'Use at least eight characters.',
+        'submit' => 'Reset password',
+    ],
+    'verify' => [
+        'title' => 'Verify your email',
+        'description' => 'Open the verification link we sent to your email before continuing.',
+        'resent' => 'A new verification link has been sent.',
+        'submit' => 'Send another verification email',
+    ],
+    'confirm' => [
+        'title' => 'Confirm your password',
+        'description' => 'This is a secure area. Confirm your password to continue.',
+        'submit' => 'Confirm password',
+    ],
+];

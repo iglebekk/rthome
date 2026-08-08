@@ -2,12 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyClubRequest;
 use App\Http\Requests\StoreClubRequest;
+use App\Http\Requests\UpdateClubRequest;
 use App\Models\Club;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ClubController extends Controller
 {
+    public function index(Request $request): View
+    {
+        $clubs = $request->user()->clubs()->orderBy('clubs.name')->get();
+
+        return view('clubs.index', ['clubs' => $clubs]);
+    }
+
+    public function create(): View
+    {
+        return view('clubs.create');
+    }
+
     public function store(StoreClubRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -19,6 +35,33 @@ class ClubController extends Controller
             'email' => $user->email,
         ]);
 
-        return back();
+        return redirect()
+            ->route('clubs.dashboard', $club)
+            ->with('status', __('clubs.messages.created'));
+    }
+
+    public function edit(Request $request, int $club): View
+    {
+        $clubModel = $request->user()->clubs()->findOrFail($club);
+
+        return view('clubs.edit', ['club' => $clubModel]);
+    }
+
+    public function update(UpdateClubRequest $request, int $club): RedirectResponse
+    {
+        $clubModel = $request->user()->clubs()->findOrFail($club);
+        $clubModel->update($request->validated());
+
+        return redirect()
+            ->route('clubs.edit', $clubModel)
+            ->with('status', __('clubs.messages.updated'));
+    }
+
+    public function destroy(DestroyClubRequest $request, int $club): RedirectResponse
+    {
+        $clubModel = $request->user()->clubs()->findOrFail($club);
+        $clubModel->delete();
+
+        return redirect()->route('home')->with('status', __('clubs.messages.deleted'));
     }
 }

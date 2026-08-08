@@ -20,6 +20,21 @@ class Club extends Model
         return $this->hasMany(Member::class);
     }
 
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function positions(): HasMany
+    {
+        return $this->hasMany(Position::class);
+    }
+
+    public function links(): HasMany
+    {
+        return $this->hasMany(Link::class);
+    }
+
     public function users(): HasManyThrough
     {
         return $this->hasManyThrough(
@@ -30,5 +45,22 @@ class Club extends Model
             'id',
             'user_id',
         );
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Club $club): void {
+            $club->links()->eachById(
+                function (Link $link): void {
+                    $link->delete();
+                },
+            );
+
+            $club->events()->eachById(
+                function (Event $event): void {
+                    $event->delete();
+                },
+            );
+        });
     }
 }

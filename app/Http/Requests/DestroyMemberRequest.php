@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Member;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -10,10 +9,16 @@ class DestroyMemberRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $member = $this->route('member');
+        $user = $this->user();
 
-        return $member instanceof Member
-            && ($this->user()?->can('delete', $member) ?? false);
+        if ($user === null) {
+            return false;
+        }
+
+        $club = $user->clubs()->findOrFail($this->route('club'));
+        $member = $club->members()->findOrFail($this->route('member'));
+
+        return $user->can('delete', $member);
     }
 
     /**

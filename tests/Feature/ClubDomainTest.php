@@ -46,7 +46,30 @@ test('club creation validates its name', function (?string $name) {
 
 test('a guest may not create a club', function () {
     $this->post(route('clubs.store'), ['name' => 'Computing Club'])
-        ->assertForbidden();
+        ->assertRedirectToRoute('login');
+});
+
+test('a guest may not view the club index', function () {
+    $this->get(route('clubs.index'))->assertRedirectToRoute('login');
+});
+
+test('a user can view their clubs in alphabetical order', function () {
+    $user = User::factory()->create();
+    $zetaClub = Club::factory()->create(['name' => 'Zeta Club']);
+    $alphaClub = Club::factory()->create(['name' => 'Alpha Club']);
+    $otherClub = Club::factory()->create(['name' => 'Other Club']);
+
+    Member::factory()->for($zetaClub)->for($user)->create();
+    Member::factory()->for($alphaClub)->for($user)->create();
+    Member::factory()->for($otherClub)->create();
+
+    $this->actingAs($user)
+        ->get(route('clubs.index'))
+        ->assertSuccessful()
+        ->assertSeeInOrder(['Alpha Club', 'Zeta Club'])
+        ->assertSee(route('clubs.dashboard', $alphaClub), false)
+        ->assertSee(route('clubs.dashboard', $zetaClub), false)
+        ->assertDontSee('Other Club');
 });
 
 test('a user may belong to several clubs but only once per club', function () {
@@ -161,7 +184,7 @@ test('outsiders and members of another club may not manage club data', function 
 
     $this->actingAs($firstUser)
         ->delete(route('clubs.members.destroy', [$secondClub, $secondMember]))
-        ->assertForbidden();
+        ->assertNotFound();
 
     $this->assertModelExists($secondMember);
 });
