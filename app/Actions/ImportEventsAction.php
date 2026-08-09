@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Club;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class ImportEventsAction
@@ -15,10 +16,19 @@ class ImportEventsAction
     {
         return DB::transaction(function () use ($club, $events): int {
             foreach ($events as $event) {
-                $event['starts_at'] = CarbonImmutable::parse($event['starts_at'])->utc();
-                $event['ends_at'] = CarbonImmutable::parse($event['ends_at'])->utc();
+                $payload = Arr::only($event, [
+                    'name',
+                    'location',
+                    'starts_at',
+                    'ends_at',
+                    'registration_url',
+                    'short_description',
+                ]);
 
-                $club->events()->create($event);
+                $payload['starts_at'] = CarbonImmutable::parse($payload['starts_at'])->utc();
+                $payload['ends_at'] = CarbonImmutable::parse($payload['ends_at'])->utc();
+
+                $club->events()->create($payload);
             }
 
             return count($events);

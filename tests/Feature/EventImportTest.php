@@ -38,6 +38,7 @@ test('a member can import one or more events with optional fields', function () 
                 'ends_at' => '2030-01-15T20:00:00+01:00',
                 'registration_url' => 'https://example.com/register',
                 'short_description' => 'A short event introduction.',
+                'image_path' => 'events/imported.png',
             ],
             [
                 'name' => 'Community lunch',
@@ -54,6 +55,7 @@ test('a member can import one or more events with optional fields', function () 
 
     expect($events)->toHaveCount(2)
         ->and($events->first()->location)->toBe('Main Hall')
+        ->and($events->first()->image_path)->toBeNull()
         ->and($events->first()->starts_at->toISOString())->toBe('2030-01-15T17:00:00.000000Z')
         ->and($events->first()->ends_at->toISOString())->toBe('2030-01-15T19:00:00.000000Z')
         ->and($events->last()->location)->toBeNull();
