@@ -16,7 +16,7 @@ return [
     'empty_upcoming_description' => 'Create the next activity for your club.',
     'empty_past' => 'No previous events',
     'empty_past_description' => 'Past events will appear here automatically.',
-    'actions' => ['create' => 'Create event', 'edit' => 'Edit event', 'delete' => 'Delete event', 'register' => 'Register for this event'],
+    'actions' => ['create' => 'Create event', 'edit' => 'Edit event', 'delete' => 'Delete event', 'register' => 'Register for this event', 'add_to_calendar' => 'Add to calendar'],
     'delete_title' => 'Delete :name?',
     'delete_description' => 'This permanently removes the event and its uploaded image.',
     'messages' => ['created' => 'Event created.', 'updated' => 'Event updated.', 'deleted' => 'Event deleted.'],

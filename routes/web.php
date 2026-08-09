@@ -36,6 +36,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     Route::resource('clubs', ClubController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::get('/clubs/{club}/dashboard', [DashboardController::class, 'show'])->name('clubs.dashboard');
+    Route::get('/clubs/{club}/settings/events', [ClubController::class, 'settingsEvents'])->name('clubs.settings.events');
+    Route::post('/clubs/{club}/settings/events/import', [ClubController::class, 'importEvents'])->name('clubs.settings.events.import');
     Route::resource('clubs.members', MemberController::class)->except('show');
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);

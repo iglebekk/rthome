@@ -1,0 +1,3 @@
+<?php
+
+return ['title' => 'Profil og sikkerhet', 'description' => 'Administrer bekreftet e-postadresse, visningsnavn og passord.', 'profile_section' => 'Profilopplysninger', 'profile_description' => 'Endring av e-postadresse krever bekreftelse før den synkroniseres med medlemskapene dine.', 'password_section' => 'Endre passord', 'password_description' => 'Bruk det nåværende passordet for å velge et nytt.', 'fields' => ['name' => 'Navn', 'email' => 'E-postadresse', 'current_password' => 'Nåværende passord', 'password' => 'Nytt passord', 'password_confirmation' => 'Bekreft nytt passord'], 'verified' => 'Bekreftet', 'unverified' => 'Bekreftelse venter', 'save_profile' => 'Lagre profil', 'save_password' => 'Oppdater passord'];
