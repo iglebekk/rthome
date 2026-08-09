@@ -2,6 +2,7 @@
     <x-app.page-header :title="$event->name" :description="__('events.view_description')" :eyebrow="$club->name">
         <x-slot:actions>
             <x-app.link-button :href="route('clubs.events.index', $club)" variant="ghost">{{ __('app.actions.back') }}</x-app.link-button>
+            <x-app.link-button :href="$taktCalendarUrl" icon="calendar-days" target="_blank" rel="noopener noreferrer">{{ __('events.actions.add_to_calendar') }}</x-app.link-button>
             <x-app.link-button :href="route('clubs.events.edit', [$club, $event])" icon="pencil-square">{{ __('events.actions.edit') }}</x-app.link-button>
         </x-slot:actions>
     </x-app.page-header>

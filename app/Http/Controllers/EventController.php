@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\BuildTaktCalendarUrlAction;
 use App\Http\Requests\DestroyEventRequest;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
@@ -47,13 +48,15 @@ class EventController extends Controller
         ]);
     }
 
-    public function show(Request $request, int $club, int $event): View
+    public function show(Request $request, int $club, int $event, BuildTaktCalendarUrlAction $buildTaktCalendarUrl): View
     {
         $clubModel = $request->user()->clubs()->findOrFail($club);
+        $eventModel = $clubModel->events()->findOrFail($event);
 
         return view('events.show', [
             'club' => $clubModel,
-            'event' => $clubModel->events()->findOrFail($event),
+            'event' => $eventModel,
+            'taktCalendarUrl' => $buildTaktCalendarUrl->handle($eventModel),
         ]);
     }
 

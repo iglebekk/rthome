@@ -10,6 +10,19 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
+test('a user without a club is directed to club creation from home', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('home'))
+        ->assertRedirectToRoute('clubs.create');
+
+    $this->actingAs($user)
+        ->get(route('clubs.create'))
+        ->assertSuccessful()
+        ->assertSee(__('clubs.create.title'));
+});
+
 test('dashboard shows filled positions with their members and excludes open positions', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();

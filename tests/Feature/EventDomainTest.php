@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\BuildTaktCalendarUrlAction;
 use App\Http\Controllers\EventController;
 use App\Models\Club;
 use App\Models\Event;
@@ -59,6 +60,32 @@ test('events belong to clubs and cast their dates', function () {
         ->and($event->starts_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($event->ends_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($event->starts_at->isFuture())->toBeTrue();
+});
+
+test('takt calendar URLs encode event details and omit empty optional fields', function () {
+    $event = Event::factory()->create([
+        'name' => 'Meetup & social',
+        'location' => 'Main Hall / Oslo',
+        'short_description' => 'Bring coffee & snacks',
+        'starts_at' => '2030-01-15 16:00:00',
+        'ends_at' => '2030-01-15 18:00:00',
+    ]);
+
+    $url = (new BuildTaktCalendarUrlAction)->handle($event);
+
+    expect($url)->toBe('https://takt.on-forge.com/create?title=Meetup%20%26%20social&start=2030-01-15T17%3A00%3A00&end=2030-01-15T19%3A00%3A00&timezone=Europe%2FOslo&location=Main%20Hall%20%2F%20Oslo&description=Bring%20coffee%20%26%20snacks');
+});
+
+test('takt calendar URLs exclude unavailable optional event details', function () {
+    $event = Event::factory()->create([
+        'location' => null,
+        'short_description' => null,
+    ]);
+
+    $url = (new BuildTaktCalendarUrlAction)->handle($event);
+
+    expect($url)->not->toContain('&location=')
+        ->not->toContain('&description=');
 });
 
 test('the upcoming scope includes events starting now and excludes started events', function () {

@@ -61,6 +61,21 @@ test('the dashboard secondary action remains readable on its dark panel', functi
         ->assertNoConsoleLogs();
 });
 
+test('a member can open the club settings submenu', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    Member::factory()->for($club)->for($user)->create();
+
+    $this->actingAs($user);
+
+    visit(route('clubs.dashboard', $club))
+        ->assertScript("getComputedStyle(document.querySelector('[data-test=\"club-settings-menu\"]')).display === 'none'")
+        ->click(__('app.navigation.settings'))
+        ->assertSee(__('app.navigation.club_details'))
+        ->assertNoJavaScriptErrors()
+        ->assertNoConsoleLogs();
+});
+
 test('the dashboard positions grid adapts between desktop and mobile widths', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
