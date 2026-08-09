@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\MemberActivationNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 
 class IdentifyAccountController extends Controller
 {
@@ -34,8 +35,8 @@ class IdentifyAccountController extends Controller
             return redirect()->route('activation.sent')->with('activation_email', $email);
         }
 
-        $request->session()->put('register.email', $email);
-
-        return redirect()->route('register');
+        throw ValidationException::withMessages([
+            'email' => __('auth.identify.unavailable'),
+        ]);
     }
 }
