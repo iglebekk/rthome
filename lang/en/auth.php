@@ -10,6 +10,7 @@ return [
         'description' => 'Enter your email address to continue.',
         'email' => 'Email address',
         'submit' => 'Continue',
+        'unavailable' => 'You can only sign in after a club has added you as a member.',
     ],
     'password_step' => [
         'title' => 'Enter your password',
