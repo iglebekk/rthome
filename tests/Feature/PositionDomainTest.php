@@ -109,7 +109,7 @@ test('a club member can create, show, update, and delete a position', function (
         ->assertJsonPath('data.member.id', $member->id)
         ->assertJsonPath('data.member.name', $member->name)
         ->assertJsonPath('data.name', 'President')
-        ->assertJsonPath('data.sort_order', 8)
+        ->assertJsonPath('data.sort_order', 0)
         ->assertJsonPath('data.start_date', '2026-01-01')
         ->assertJsonPath('data.end_date', null)
         ->assertJsonStructure([
@@ -158,22 +158,35 @@ test('a club member can create, show, update, and delete a position', function (
     $this->assertModelMissing($position);
 });
 
-test('the first automatically ordered position starts at zero', function () {
-    [$user, $club, $member] = createPositionClubMember();
+test('a position without a member or order uses the open defaults', function () {
+    [$user, $club] = createPositionClubMember();
 
     $this->actingAs($user)
         ->postJson(route('clubs.positions.store', $club), [
-            'member_id' => $member->id,
             'name' => 'President',
         ])
         ->assertCreated()
+        ->assertJsonPath('data.member_id', null)
         ->assertJsonPath('data.sort_order', 0);
+});
+
+test('an empty sort order from the HTML form uses zero', function () {
+    [$user, $club] = createPositionClubMember();
+
+    $this->actingAs($user)
+        ->post(route('clubs.positions.store', $club), [
+            'name' => 'President',
+            'sort_order' => '',
+        ])
+        ->assertRedirect(route('clubs.positions.index', $club));
+
+    expect($club->positions()->sole()->sort_order)->toBe(0);
 });
 
 test('the index returns all positions ordered manually and then by id with member data', function () {
     [$user, $club, $member] = createPositionClubMember();
     $firstAtSameOrder = Position::factory()->for($club)->for($member)->create([
-        'name' => 'Secretary',
+        'name' => 'Treasurer',
         'sort_order' => 2,
     ]);
     $last = Position::factory()->for($club)->for($member)->create([
@@ -181,7 +194,7 @@ test('the index returns all positions ordered manually and then by id with membe
         'sort_order' => 8,
     ]);
     $secondAtSameOrder = Position::factory()->for($club)->for($member)->create([
-        'name' => 'Treasurer',
+        'name' => 'Secretary',
         'sort_order' => 2,
     ]);
 
@@ -197,9 +210,9 @@ test('the index returns all positions ordered manually and then by id with membe
 
     $response->assertSuccessful()
         ->assertJsonCount(3, 'data')
-        ->assertJsonPath('data.0.id', $firstAtSameOrder->id)
+        ->assertJsonPath('data.0.id', $secondAtSameOrder->id)
         ->assertJsonPath('data.0.member.id', $member->id)
-        ->assertJsonPath('data.1.id', $secondAtSameOrder->id)
+        ->assertJsonPath('data.1.id', $firstAtSameOrder->id)
         ->assertJsonPath('data.2.id', $last->id);
 });
 
@@ -256,20 +269,18 @@ test('position creation enforces name uniqueness within the club', function () {
         ->assertJsonValidationErrors('name');
 });
 
-test('position creation requires a member from the same club', function (?int $memberId) {
+test('position creation rejects a member from another club', function () {
     [$user, $club] = createPositionClubMember();
+    $otherClubMember = Member::factory()->create();
 
     $this->actingAs($user)
         ->postJson(route('clubs.positions.store', $club), [
-            'member_id' => $memberId,
+            'member_id' => $otherClubMember->id,
             'name' => 'President',
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('member_id');
-})->with([
-    'missing member' => null,
-    'member from another club' => fn () => Member::factory()->create()->id,
-]);
+});
 
 test('position creation validates date periods while allowing a start date alone', function () {
     [$user, $club, $member] = createPositionClubMember();
@@ -316,11 +327,14 @@ test('position updates validate explicit member and name changes', function () {
     $position = Position::factory()->for($club)->for($member)->create(['name' => 'President']);
     Position::factory()->for($club)->for($member)->create(['name' => 'Treasurer']);
     $otherClubMember = Member::factory()->create();
+    $sortOrder = $position->sort_order;
 
     $this->actingAs($user)
         ->patchJson(route('clubs.positions.update', [$club, $position]), ['member_id' => null])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('member_id');
+        ->assertSuccessful()
+        ->assertJsonPath('data.member_id', null)
+        ->assertJsonPath('data.member', null)
+        ->assertJsonPath('data.sort_order', $sortOrder);
 
     $this->actingAs($user)
         ->patchJson(route('clubs.positions.update', [$club, $position]), [

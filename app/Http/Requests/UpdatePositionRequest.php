@@ -41,7 +41,7 @@ class UpdatePositionRequest extends FormRequest
         return [
             'member_id' => [
                 'sometimes',
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists(Member::class, 'id')
                     ->where(fn (Builder $query): Builder => $query->where('club_id', $clubId)),
@@ -55,7 +55,7 @@ class UpdatePositionRequest extends FormRequest
                     ->where(fn (Builder $query): Builder => $query->where('club_id', $clubId))
                     ->ignore($this->route('position')),
             ],
-            'sort_order' => ['sometimes', 'required', 'integer', 'min:0'],
+            'sort_order' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'start_date' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
             'end_date' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
         ];

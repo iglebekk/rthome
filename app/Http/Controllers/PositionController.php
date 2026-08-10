@@ -28,6 +28,7 @@ class PositionController extends Controller
         $positions = $clubModel->positions()
             ->with('member')
             ->orderBy('sort_order')
+            ->orderBy('name')
             ->orderBy('id')
             ->get();
 
@@ -54,10 +55,7 @@ class PositionController extends Controller
         $clubModel = $request->user()->clubs()->findOrFail($club);
         $attributes = $request->validated();
 
-        if (! array_key_exists('sort_order', $attributes)) {
-            $lastSortOrder = $clubModel->positions()->max('sort_order');
-            $attributes['sort_order'] = $lastSortOrder === null ? 0 : $lastSortOrder + 1;
-        }
+        $attributes['sort_order'] = $attributes['sort_order'] ?? 0;
 
         $position = $clubModel->positions()->create($attributes)->load('member');
 
@@ -108,7 +106,13 @@ class PositionController extends Controller
         $clubModel = $request->user()->clubs()->findOrFail($club);
         $positionModel = $clubModel->positions()->findOrFail($position);
 
-        $positionModel->update($request->validated());
+        $attributes = $request->validated();
+
+        if (array_key_exists('sort_order', $attributes)) {
+            $attributes['sort_order'] = $attributes['sort_order'] ?? 0;
+        }
+
+        $positionModel->update($attributes);
 
         if (! $request->expectsJson()) {
             return redirect()->route('clubs.positions.index', $clubModel)

@@ -3,7 +3,7 @@
 <x-app.card>
     <x-form :action="$position ? route('clubs.positions.update', [$club, $position]) : route('clubs.positions.store', $club)" :method="$position ? 'PUT' : 'POST'">
         <x-form.input name="name" :label="__('positions.fields.name')" :value="old('name', $position?->name)" required autofocus />
-        <x-form.select name="member_id" :label="__('positions.fields.member')" :options="$memberOptions" :value="old('member_id', $position?->member_id)" :placeholder="__('positions.select_member')" required />
+        <x-form.select name="member_id" :label="__('positions.fields.member')" :options="$memberOptions" :value="old('member_id', $position?->member_id)" :placeholder="__('positions.select_member')" />
         <x-form.input name="sort_order" type="number" min="0" :label="__('positions.fields.sort_order')" :value="old('sort_order', $position?->sort_order)" />
         <div class="grid gap-5 sm:grid-cols-2">
             <x-form.input name="start_date" type="date" :label="__('positions.fields.start_date')" :value="old('start_date', $position?->start_date?->toDateString())" />

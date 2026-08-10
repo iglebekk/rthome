@@ -1,4 +1,4 @@
-@props(['position', 'club', 'memberFirst' => false])
+@props(['position', 'club', 'memberFirst' => false, 'editable' => false])
 
 <x-app.card class="flex h-full items-center justify-between gap-4">
     <div class="grid gap-1">
@@ -10,4 +10,7 @@
         @endif
         @if ($position->start_date || $position->end_date)<flux:text size="sm">{{ $position->start_date?->toFormattedDateString() ?? __('positions.period.open') }} – {{ $position->end_date?->toFormattedDateString() ?? __('positions.period.open') }}</flux:text>@endif
     </div>
+    @if ($editable)
+        <x-app.icon-button :href="route('clubs.positions.edit', [$club, $position])" icon="pencil-square" :label="__('positions.actions.edit')" />
+    @endif
 </x-app.card>

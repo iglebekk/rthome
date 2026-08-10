@@ -38,7 +38,7 @@ class StorePositionRequest extends FormRequest
 
         return [
             'member_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists(Member::class, 'id')
                     ->where(fn (Builder $query): Builder => $query->where('club_id', $clubId)),
@@ -50,7 +50,7 @@ class StorePositionRequest extends FormRequest
                 Rule::unique(Position::class, 'name')
                     ->where(fn (Builder $query): Builder => $query->where('club_id', $clubId)),
             ],
-            'sort_order' => ['sometimes', 'required', 'integer', 'min:0'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
             'start_date' => ['required_with:end_date', 'nullable', 'date_format:Y-m-d'],
             'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'],
         ];

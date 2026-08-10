@@ -96,6 +96,18 @@ test('events index cards link to their event details', function () {
         ->assertDontSee(route('clubs.events.edit', [$club, $event]), false);
 });
 
+test('positions index cards link to their edit pages', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    Member::factory()->for($club)->for($user)->create();
+    $position = Position::factory()->for($club)->create();
+
+    $this->actingAs($user)->get(route('clubs.positions.index', $club))
+        ->assertSuccessful()
+        ->assertSee(__('positions.actions.edit'))
+        ->assertSee('href="'.route('clubs.positions.edit', [$club, $position]).'"', false);
+});
+
 test('event details include a Takt calendar link', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
