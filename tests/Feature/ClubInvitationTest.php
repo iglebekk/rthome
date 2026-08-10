@@ -4,9 +4,7 @@ use App\Models\Club;
 use App\Models\ClubInvitation;
 use App\Models\Member;
 use App\Models\User;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Support\Facades\Event;
 
 uses(LazilyRefreshDatabase::class);
 
@@ -83,31 +81,23 @@ test('only members can manage a clubs invitations', function () {
     $this->actingAs($otherUser)->delete(route('club-invitations.destroy', $invitation))->assertForbidden();
 });
 
-test('a newly registered users pending membership is linked after verification', function () {
-    Event::fakeExcept(Verified::class);
+test('an invitation cannot create an account for an unknown email', function () {
     $owner = User::factory()->create();
     $club = Club::factory()->create();
     Member::factory()->for($club)->for($owner)->create();
-    $token = 'registration-invitation-token';
+    $token = 'unknown-member-invitation-token';
     ClubInvitation::factory()->for($club)->for($owner, 'createdBy')->create([
         'token_hash' => hash('sha256', $token),
     ]);
 
-    $this->get(route('club-invitations.show', $token));
-    $this->post(route('register'), [
-        'name' => 'New member',
-        'email' => 'new-member@example.com',
-        'password' => 'secure-password',
-        'password_confirmation' => 'secure-password',
-    ]);
+    $this->get(route('club-invitations.show', $token))->assertSuccessful();
 
-    $user = User::query()->where('email', 'new-member@example.com')->sole();
-    expect($club->members()->where('email', $user->email)->whereNull('user_id')->exists())->toBeTrue();
+    $this->post(route('login.identify'), ['email' => 'new-member@example.com'])
+        ->assertSessionHasErrors([
+            'email' => __('auth.identify.unavailable'),
+        ]);
 
-    $user->forceFill(['email_verified_at' => now()])->save();
-    event(new Verified($user));
-
-    expect($club->members()->where('user_id', $user->id)->count())->toBe(1);
+    $this->get('/register')->assertNotFound();
 });
 
 test('the invitation settings page shows links and controls', function () {
