@@ -10,6 +10,15 @@ return [
         'danger_description' => 'Dette sletter alle medlemmer, verv, arrangementer og opplastede arrangementsbilder permanent.',
         'confirm_label' => 'Skriv klubbnavnet for å bekrefte',
         'delete' => 'Slett klubben permanent',
+        'invitations' => [
+            'title' => 'Medlemsinvitasjoner', 'description' => 'Opprett delbare lenker som lar folk bli med i klubben.',
+            'name' => 'Navn på lenken (valgfritt)', 'duration' => 'Levetid',
+            'durations' => ['1' => '1 dag', '7' => '7 dager', '30' => '30 dager', '90' => '90 dager'],
+            'create' => 'Opprett invitasjonslenke', 'default_name' => 'Klubb invitasjon', 'copy' => 'Kopier lenke', 'copied' => 'Lenken er kopiert',
+            'status_active' => 'Aktiv til :date', 'status_expired' => 'Utløpt :date', 'status_revoked' => 'Deaktivert :date', 'deactivate' => 'Deaktiver', 'empty' => 'Ingen invitasjonslenker ennå.', 'empty_description' => 'Opprett en lenke for å invitere nye medlemmer.',
+            'join_title' => 'Bli med i :club', 'join_description' => 'Du er invitert til å bli medlem i denne klubben.', 'join_as' => 'Du er logget inn som :name (:email).', 'join_confirm' => 'Bli med i klubben', 'sign_in' => 'Logg inn for å fortsette', 'register' => 'Opprett konto for å fortsette', 'verify_required' => 'Bekreft e-postadressen din før du blir medlem.',
+            'messages' => ['joined' => 'Du er nå medlem i klubben.', 'already_member' => 'Du er allerede medlem i denne klubben.', 'revoked' => 'Invitasjonslenken er deaktivert.'],
+        ],
         'events' => [
             'title' => 'Arrangementer',
             'description' => 'Importer arrangementer samlet med et JSON-objekt.',

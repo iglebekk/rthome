@@ -2,7 +2,9 @@
 
 namespace App\Actions\Fortify;
 
+use App\Actions\AcceptClubInvitationAction;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -35,10 +37,18 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => Str::lower(trim($input['email'])),
             'password' => Hash::make($input['password']),
         ]);
+
+        $token = app(Request::class)->session()->get('club_invitation.token');
+
+        if (is_string($token)) {
+            app(AcceptClubInvitationAction::class)->reserve($user, $token);
+        }
+
+        return $user;
     }
 }

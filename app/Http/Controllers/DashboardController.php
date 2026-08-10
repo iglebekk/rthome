@@ -10,6 +10,12 @@ class DashboardController extends Controller
 {
     public function home(Request $request): RedirectResponse
     {
+        $invitationToken = $request->session()->get('club_invitation.token');
+
+        if (is_string($invitationToken)) {
+            return redirect()->route('club-invitations.show', $invitationToken);
+        }
+
         $club = $request->user()->clubs()->orderBy('clubs.name')->first();
 
         return $club === null

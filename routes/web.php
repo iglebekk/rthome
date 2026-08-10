@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\IdentifyAccountController;
 use App\Http\Controllers\Auth\MemberActivationController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\ClubInvitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\LinkController;
@@ -16,6 +17,10 @@ Route::get('/', function () {
         ? redirect()->route('home')
         : redirect()->route('login');
 })->name('welcome');
+
+Route::get('/join/{token}', [ClubInvitationController::class, 'show'])
+    ->middleware('throttle:30,1')
+    ->name('club-invitations.show');
 
 Route::middleware('guest')->group(function (): void {
     Route::post('/login/identify', IdentifyAccountController::class)
@@ -38,6 +43,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/clubs/{club}/dashboard', [DashboardController::class, 'show'])->name('clubs.dashboard');
     Route::get('/clubs/{club}/settings/events', [ClubController::class, 'settingsEvents'])->name('clubs.settings.events');
     Route::post('/clubs/{club}/settings/events/import', [ClubController::class, 'importEvents'])->name('clubs.settings.events.import');
+    Route::get('/clubs/{club}/settings/invitations', [ClubInvitationController::class, 'index'])->name('clubs.settings.invitations');
+    Route::post('/clubs/{club}/settings/invitations', [ClubInvitationController::class, 'store'])->name('clubs.settings.invitations.store');
+    Route::delete('/club-invitations/{invitation}', [ClubInvitationController::class, 'destroy'])->name('club-invitations.destroy');
+    Route::post('/join/{token}/confirm', [ClubInvitationController::class, 'confirm'])->name('club-invitations.confirm');
     Route::resource('clubs.members', MemberController::class)->except('show');
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);

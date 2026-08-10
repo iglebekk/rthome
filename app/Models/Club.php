@@ -35,6 +35,11 @@ class Club extends Model
         return $this->hasMany(Link::class);
     }
 
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(ClubInvitation::class);
+    }
+
     public function users(): HasManyThrough
     {
         return $this->hasManyThrough(
@@ -53,6 +58,12 @@ class Club extends Model
             $club->links()->eachById(
                 function (Link $link): void {
                     $link->delete();
+                },
+            );
+
+            $club->invitations()->eachById(
+                function (ClubInvitation $invitation): void {
+                    $invitation->delete();
                 },
             );
 

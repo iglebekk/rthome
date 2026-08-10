@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Club;
+use App\Models\ClubInvitation;
 use App\Models\Member;
 use App\Models\Position;
 use App\Models\User;
@@ -72,6 +73,21 @@ test('a member can open the club settings submenu', function () {
         ->assertScript("getComputedStyle(document.querySelector('[data-test=\"club-settings-menu\"]')).display === 'none'")
         ->click(__('app.navigation.settings'))
         ->assertSee(__('app.navigation.club_details'))
+        ->assertNoJavaScriptErrors()
+        ->assertNoConsoleLogs();
+});
+
+test('a member can copy an active invitation link', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    Member::factory()->for($club)->for($user)->create();
+    ClubInvitation::factory()->for($club)->for($user, 'createdBy')->create();
+
+    $this->actingAs($user);
+
+    visit(route('clubs.settings.invitations', $club))
+        ->click(__('clubs.settings.invitations.copy'))
+        ->assertSee(__('clubs.settings.invitations.copied'))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
 });

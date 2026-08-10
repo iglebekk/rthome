@@ -98,6 +98,19 @@ test('expired activation links are rejected by signed middleware', function () {
     $this->get($url)->assertForbidden();
 });
 
+test('html encoded verification links are accepted', function () {
+    $user = User::factory()->unverified()->create();
+    $url = URL::temporarySignedRoute('verification.verify', now()->addMinute(), [
+        'id' => $user,
+        'hash' => sha1($user->email),
+    ]);
+    $encodedUrl = str_replace('&signature=', '&amp;signature=', $url);
+
+    $this->actingAs($user)->get($encodedUrl)->assertRedirect();
+
+    expect($user->refresh()->hasVerifiedEmail())->toBeTrue();
+});
+
 test('verification links new memberships and synchronizes a changed profile email', function () {
     Event::fakeExcept(Verified::class);
     $user = User::factory()->create(['email' => 'old@example.com']);

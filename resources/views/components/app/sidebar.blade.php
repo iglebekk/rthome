@@ -19,7 +19,7 @@
             <a href="{{ route('clubs.positions.index', $club) }}" class="app-nav-link"><flux:icon name="briefcase" class="size-5" />{{ __('app.navigation.positions') }}</a>
             <a href="{{ route('clubs.events.index', $club) }}" class="app-nav-link"><flux:icon name="calendar-days" class="size-5" />{{ __('app.navigation.events') }}</a>
             <a href="{{ route('clubs.links.index', $club) }}" class="app-nav-link"><flux:icon name="link" class="size-5" />{{ __('app.navigation.links') }}</a>
-            <div x-data="{ settingsOpen: {{ request()->routeIs('clubs.edit', 'clubs.settings.events') ? 'true' : 'false' }} }" x-id="['club-settings-menu']">
+            <div x-data="{ settingsOpen: {{ request()->routeIs('clubs.edit', 'clubs.settings.events', 'clubs.settings.invitations') ? 'true' : 'false' }} }" x-id="['club-settings-menu']">
                 <x-app.button
                     x-on:click="settingsOpen = !settingsOpen"
                     x-bind:aria-expanded="settingsOpen"
@@ -42,6 +42,7 @@
                 >
                     <a href="{{ route('clubs.edit', $club) }}" class="app-nav-link pl-11"><flux:icon name="building-office-2" class="size-5" />{{ __('app.navigation.club_details') }}</a>
                     <a href="{{ route('clubs.settings.events', $club) }}" class="app-nav-link pl-11"><flux:icon name="calendar-days" class="size-5" />{{ __('app.navigation.events') }}</a>
+                    <a href="{{ route('clubs.settings.invitations', $club) }}" class="app-nav-link pl-11"><flux:icon name="user-plus" class="size-5" />{{ __('app.navigation.invitations') }}</a>
                 </div>
             </div>
         </nav>
