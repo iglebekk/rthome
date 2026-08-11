@@ -46,7 +46,7 @@ test('a member can sign in through both account steps and reach the dashboard', 
         ->assertNoConsoleLogs();
 });
 
-test('the dashboard secondary action remains readable on its dark panel', function () {
+test('the dashboard quick actions are available in a dropdown', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
     Member::factory()->for($club)->for($user)->create();
@@ -55,9 +55,15 @@ test('the dashboard secondary action remains readable on its dark panel', functi
 
     visit(route('clubs.dashboard', $club))
         ->inLightMode()
-        ->assertScript('getComputedStyle(document.querySelector(\'[data-test="dashboard-secondary-action"]\')).color === "rgb(255, 255, 255)"')
-        ->hover('@dashboard-secondary-action')
-        ->assertScript('getComputedStyle(document.querySelector(\'[data-test="dashboard-secondary-action"]\')).color === "rgb(255, 255, 255)"')
+        ->assertSee(__('dashboard.quick_actions'))
+        ->assertScript('! document.querySelector(\'[data-test="dashboard-secondary-action"]\')')
+        ->click(__('dashboard.quick_actions'))
+        ->assertSee(__('members.actions.create'))
+        ->assertSee(__('events.actions.create'))
+        ->assertSee(__('links.actions.create'))
+        ->assertScript('document.querySelector(\'[data-test="dashboard-quick-action-member"]\').href === '.json_encode(route('clubs.members.create', $club)))
+        ->assertScript('document.querySelector(\'[data-test="dashboard-quick-action-event"]\').href === '.json_encode(route('clubs.events.create', $club)))
+        ->assertScript('document.querySelector(\'[data-test="dashboard-quick-action-link"]\').href === '.json_encode(route('clubs.links.create', $club)))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
 });
