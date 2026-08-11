@@ -97,6 +97,7 @@ test('an invitation cannot create an account for an unknown email', function () 
             'email' => __('auth.identify.unavailable'),
         ]);
 
+    $this->assertDatabaseMissing('users', ['email' => 'new-member@example.com']);
     $this->get('/register')->assertNotFound();
 });
 

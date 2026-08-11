@@ -39,10 +39,13 @@ test('account identification sends an activation for an unclaimed membership', f
 });
 
 test('an unknown email stays on identification because registration is disabled', function () {
-    $this->post(route('login.identify'), ['email' => 'new@example.com'])
+    $this->from(route('login.identify'))
+        ->post(route('login.identify'), ['email' => 'new@example.com'])
+        ->assertRedirect(route('login.identify'))
         ->assertSessionHasErrors([
             'email' => __('auth.identify.unavailable'),
-        ]);
+        ])
+        ->assertSessionMissing('register.email');
 
     $this->get('/register')->assertNotFound();
 });
