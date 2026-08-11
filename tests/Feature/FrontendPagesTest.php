@@ -13,10 +13,13 @@ test('guest authentication pages render', function (string $routeName, string $t
     $this->get(route($routeName))->assertSuccessful()->assertSee($text);
 })->with([
     'identify' => ['login', fn () => __('auth.identify.title')],
-    'register' => ['register', fn () => __('auth.register.title')],
     'forgot password' => ['password.request', fn () => __('auth.forgot.title')],
     'activation sent' => ['activation.sent', fn () => __('auth.activation.sent_title')],
 ]);
+
+test('guest registration page is unavailable', function () {
+    $this->get('/register')->assertNotFound();
+});
 
 test('every club administration page renders on desktop-compatible markup', function () {
     $user = User::factory()->create();

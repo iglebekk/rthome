@@ -127,6 +127,7 @@ test('dashboard shows the time until the nearest upcoming event', function () {
         'name' => 'Nearest event',
         'starts_at' => now()->addDays(2),
         'ends_at' => now()->addDays(2)->addHour(),
+        'registration_url' => 'https://example.com/nearest-event',
     ]);
     Event::factory()->for(Club::factory())->create(['name' => 'Other club event']);
 
@@ -135,10 +136,33 @@ test('dashboard shows the time until the nearest upcoming event', function () {
     $response->assertSuccessful()
         ->assertSee('Nearest event')
         ->assertSee($nearestEvent->starts_at->diffForHumans())
+        ->assertSee(__('dashboard.metrics.countdown_to_next_event'))
+        ->assertSee(__('dashboard.metrics.registration_link'))
+        ->assertSee('href="'.$nearestEvent->registration_url.'"', false)
+        ->assertSee('target="_blank"', false)
+        ->assertDontSee(__('dashboard.metrics.upcoming_events'))
         ->assertDontSee('Other club event');
 
     expect($response->viewData('nextEvent')->is($nearestEvent))->toBeTrue()
         ->and($response->viewData('nextEventCountdown'))->toBe($nearestEvent->starts_at->diffForHumans());
+});
+
+test('dashboard hides the next event registration link when it is missing', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    Member::factory()->for($club)->for($user)->create();
+    Event::factory()->for($club)->create([
+        'name' => 'Event without registration',
+        'registration_url' => null,
+        'starts_at' => now()->addDay(),
+        'ends_at' => now()->addDay()->addHour(),
+    ]);
+
+    $response = $this->actingAs($user)->get(route('clubs.dashboard', $club));
+
+    $response->assertSuccessful()
+        ->assertSee('Event without registration')
+        ->assertDontSee(__('dashboard.metrics.registration_link'));
 });
 
 test('dashboard shows a create event empty state when no event is upcoming', function () {

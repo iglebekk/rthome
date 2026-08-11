@@ -38,14 +38,16 @@ test('account identification sends an activation for an unclaimed membership', f
     Notification::assertSentOnDemand(MemberActivationNotification::class);
 });
 
-test('an unknown email continues to open registration', function () {
-    $this->post(route('login.identify'), ['email' => 'new@example.com'])
-        ->assertRedirectToRoute('register')
-        ->assertSessionHas('register.email', 'new@example.com');
+test('an unknown email stays on identification because registration is disabled', function () {
+    $this->from(route('login.identify'))
+        ->post(route('login.identify'), ['email' => 'new@example.com'])
+        ->assertRedirect(route('login.identify'))
+        ->assertSessionHasErrors([
+            'email' => __('auth.identify.unavailable'),
+        ])
+        ->assertSessionMissing('register.email');
 
-    $this->get(route('register'))
-        ->assertSuccessful()
-        ->assertSee('new@example.com');
+    $this->get('/register')->assertNotFound();
 });
 
 test('a signed activation creates one verified account and links every matching membership', function () {
