@@ -4,13 +4,22 @@
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <x-app.metric-card :label="__('dashboard.metrics.members')" :value="$memberCount" :description="__('dashboard.metrics.members_description')" icon="users" />
         @if ($nextEvent)
-            <x-app.metric-card :label="__('dashboard.metrics.next_event')" :value="$nextEventCountdown" :description="__('dashboard.metrics.next_event_description', ['event' => $nextEvent->name])" icon="calendar-days" />
+            <x-app.metric-card :label="__('dashboard.metrics.countdown_to_next_event')" :value="$nextEventCountdown" icon="calendar-days" />
+            <x-app.card class="grid gap-3">
+                <div class="flex items-center justify-between gap-4">
+                    <flux:text>{{ __('dashboard.metrics.next_event') }}</flux:text>
+                    <flux:icon name="calendar-days" class="size-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <flux:heading size="lg">{{ $nextEvent->name }}</flux:heading>
+                @if ($nextEvent->registration_url)
+                    <x-app.text-link :href="$nextEvent->registration_url" target="_blank" rel="noopener noreferrer">{{ __('dashboard.metrics.registration_link') }}</x-app.text-link>
+                @endif
+            </x-app.card>
         @else
             <x-app.empty-state :title="__('dashboard.empty_next_event')" :description="__('dashboard.empty_next_event_description')" icon="calendar-days">
                 <x-slot:action><x-app.link-button :href="route('clubs.events.create', $club)" icon="plus">{{ __('events.actions.create') }}</x-app.link-button></x-slot:action>
             </x-app.empty-state>
         @endif
-        <x-app.metric-card :label="__('dashboard.metrics.upcoming_events')" :value="$upcomingEvents->count()" :description="__('dashboard.metrics.upcoming_events_description')" icon="calendar-days" />
     </div>
 
     <x-story.media-panel :title="__('dashboard.quick_actions')" :description="__('dashboard.description')">
@@ -21,7 +30,7 @@
         </div>
     </x-story.media-panel>
 
-    <div class="grid gap-8 xl:grid-cols-2">
+    <div class="grid content-start gap-8 xl:grid-cols-2">
         <x-app.section :title="__('dashboard.upcoming')">
             <div class="grid gap-3">
                 @forelse ($upcomingEvents as $event)

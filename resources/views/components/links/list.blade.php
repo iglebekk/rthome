@@ -1,6 +1,6 @@
 @props(['club', 'links'])
 
-<div class="grid gap-4">
+<div class="grid content-start gap-4">
     @forelse ($links as $link)
         <x-links.card :$link :$club />
     @empty
