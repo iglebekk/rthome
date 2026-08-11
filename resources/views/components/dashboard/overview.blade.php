@@ -22,14 +22,6 @@
         @endif
     </div>
 
-    <x-story.media-panel :title="__('dashboard.quick_actions')" :description="__('dashboard.description')">
-        <div class="flex flex-wrap gap-3">
-            <x-app.link-button :href="route('clubs.members.create', $club)" icon="user-plus">{{ __('members.actions.create') }}</x-app.link-button>
-            <x-app.link-button :href="route('clubs.events.create', $club)" variant="ghost" icon="calendar-days" data-test="dashboard-secondary-action" class="text-white! hover:bg-white/15! hover:text-white!">{{ __('events.actions.create') }}</x-app.link-button>
-            <x-app.link-button :href="route('clubs.links.create', $club)" variant="ghost" icon="link" class="text-white! hover:bg-white/15! hover:text-white!">{{ __('links.actions.create') }}</x-app.link-button>
-        </div>
-    </x-story.media-panel>
-
     <div class="grid content-start gap-8 xl:grid-cols-2">
         <x-app.section :title="__('dashboard.upcoming')">
             <div class="grid gap-3">

@@ -1,8 +1,12 @@
 const copyText = async (text) => {
     if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
+        try {
+            await navigator.clipboard.writeText(text);
 
-        return true;
+            return true;
+        } catch {
+            // Fall back to the legacy copy API when clipboard permissions are unavailable.
+        }
     }
 
     const textarea = document.createElement('textarea');

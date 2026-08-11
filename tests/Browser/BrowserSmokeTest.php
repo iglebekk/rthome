@@ -46,7 +46,7 @@ test('a member can sign in through both account steps and reach the dashboard', 
         ->assertNoConsoleLogs();
 });
 
-test('the dashboard secondary action remains readable on its dark panel', function () {
+test('the dashboard quick actions are available in a dropdown', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
     Member::factory()->for($club)->for($user)->create();
@@ -55,9 +55,16 @@ test('the dashboard secondary action remains readable on its dark panel', functi
 
     visit(route('clubs.dashboard', $club))
         ->inLightMode()
-        ->assertScript('getComputedStyle(document.querySelector(\'[data-test="dashboard-secondary-action"]\')).color === "rgb(255, 255, 255)"')
-        ->hover('@dashboard-secondary-action')
-        ->assertScript('getComputedStyle(document.querySelector(\'[data-test="dashboard-secondary-action"]\')).color === "rgb(255, 255, 255)"')
+        ->assertSee(__('dashboard.quick_actions'))
+        ->assertScript('! document.querySelector(\'[data-test="dashboard-secondary-action"]\')')
+        ->click(__('dashboard.quick_actions'))
+        ->assertScript("getComputedStyle(document.querySelector('[data-test=\"dashboard-quick-actions-menu\"]')).display !== 'none'")
+        ->assertScript("document.querySelector('[data-test=\"dashboard-quick-action-member\"]') !== null")
+        ->assertScript("document.querySelector('[data-test=\"dashboard-quick-action-event\"]') !== null")
+        ->assertScript("document.querySelector('[data-test=\"dashboard-quick-action-link\"]') !== null")
+        ->assertScript('document.querySelector(\'[data-test="dashboard-quick-action-member"]\').href === '.json_encode(route('clubs.members.create', $club)))
+        ->assertScript('document.querySelector(\'[data-test="dashboard-quick-action-event"]\').href === '.json_encode(route('clubs.events.create', $club)))
+        ->assertScript('document.querySelector(\'[data-test="dashboard-quick-action-link"]\').href === '.json_encode(route('clubs.links.create', $club)))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
 });
@@ -87,6 +94,7 @@ test('a member can copy an active invitation link', function () {
 
     visit(route('clubs.settings.invitations', $club))
         ->click(__('clubs.settings.invitations.copy'))
+        ->wait(1)
         ->assertSee(__('clubs.settings.invitations.copied'))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
