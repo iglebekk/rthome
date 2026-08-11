@@ -93,6 +93,7 @@ test('a member can copy an active invitation link', function () {
 
     visit(route('clubs.settings.invitations', $club))
         ->click(__('clubs.settings.invitations.copy'))
+        ->wait(1)
         ->assertSee(__('clubs.settings.invitations.copied'))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
