@@ -12,12 +12,14 @@
                 </div>
                 <flux:heading size="lg">{{ $nextEvent->name }}</flux:heading>
                 @if ($nextEvent->registration_url)
-                    <x-app.text-link :href="$nextEvent->registration_url" target="_blank" rel="noopener noreferrer">{{ __('dashboard.metrics.registration_link') }}</x-app.text-link>
+                    <x-app.text-link :href="$nextEvent->registration_url" target="_blank"
+                        rel="noopener noreferrer">{{ __('dashboard.metrics.registration_link') }}</x-app.text-link>
                 @endif
             </x-app.card>
         @else
             <x-app.empty-state :title="__('dashboard.empty_next_event')" :description="__('dashboard.empty_next_event_description')" icon="calendar-days">
-                <x-slot:action><x-app.link-button :href="route('clubs.events.create', $club)" icon="plus">{{ __('events.actions.create') }}</x-app.link-button></x-slot:action>
+                <x-slot:action><x-app.link-button :href="route('clubs.events.create', $club)"
+                        icon="plus">{{ __('events.actions.create') }}</x-app.link-button></x-slot:action>
             </x-app.empty-state>
         @endif
     </div>
@@ -29,7 +31,8 @@
                     <x-dashboard.event :$event :$club />
                 @empty
                     <x-app.empty-state :title="__('dashboard.empty_events')" :description="__('dashboard.empty_events_description')" icon="calendar-days">
-                        <x-slot:action><x-app.link-button :href="route('clubs.events.create', $club)" icon="plus">{{ __('events.actions.create') }}</x-app.link-button></x-slot:action>
+                        <x-slot:action><x-app.link-button :href="route('clubs.events.create', $club)"
+                                icon="plus">{{ __('events.actions.create') }}</x-app.link-button></x-slot:action>
                     </x-app.empty-state>
                 @endforelse
             </div>
@@ -43,7 +46,8 @@
                     <x-links.card :$link :$club />
                 @empty
                     <x-app.empty-state :title="__('dashboard.empty_links')" :description="__('dashboard.empty_links_description')" icon="link">
-                        <x-slot:action><x-app.link-button :href="route('clubs.links.create', $club)" icon="plus">{{ __('links.actions.create') }}</x-app.link-button></x-slot:action>
+                        <x-slot:action><x-app.link-button :href="route('clubs.links.create', $club)"
+                                icon="plus">{{ __('links.actions.create') }}</x-app.link-button></x-slot:action>
                     </x-app.empty-state>
                 @endforelse
             </div>
@@ -52,7 +56,8 @@
             @endif
         </x-app.section>
         <x-app.section :title="__('positions.title')" class="xl:col-span-2">
-            <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,280px))] gap-3" data-test="dashboard-positions-grid">
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,280px))] gap-3"
+                data-test="dashboard-positions-grid">
                 @forelse ($filledPositions as $position)
                     <x-app.position-card :$position :$club member-first />
                 @empty
