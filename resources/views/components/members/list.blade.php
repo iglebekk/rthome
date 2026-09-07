@@ -10,6 +10,7 @@
         <x-app.card class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <div class="grid min-w-0 gap-2">
                 <div class="flex flex-wrap items-center gap-2"><x-app.heading>{{ $member->name }}</x-app.heading>@if ($member->user_id)<x-app.badge color="emerald">{{ __('profile.verified') }}</x-app.badge>@endif</div>
+                @if ($member->invoice_company_name)<x-app.text size="sm">{{ $member->invoice_company_name }}</x-app.text>@endif
                 <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-zinc-600 dark:text-zinc-300">@if ($member->email)<span>{{ $member->email }}</span>@endif @if ($member->phone)<span>{{ $member->phone }}</span>@endif</div>
                 <div class="flex flex-wrap gap-2">
                     @forelse ($member->positions as $position)<x-app.badge>{{ $position->name }}</x-app.badge>@empty<x-app.text size="sm">{{ __('members.no_positions') }}</x-app.text>@endforelse
