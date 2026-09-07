@@ -25,6 +25,26 @@ return [
     ],
     'delete_title' => 'Slett :name?',
     'delete_description' => 'Vervene blir ledige. Hvis dette er det siste medlemmet, blir hele klubben og alle dataene også slettet.',
+    'import' => [
+        'title' => 'Importer medlemmer',
+        'description' => 'Lim inn et JSON-objekt med en members-tabell. Eksisterende medlemmer matches på e-post og oppdateres, mens nye medlemmer legges til.',
+        'fields' => 'Hvert medlem må ha name og kan inneholde email og phone. Tom email eller phone beholder eksisterende kontaktinformasjon. Maksimalt 100 medlemmer.',
+        'json_label' => 'Medlemmer som JSON',
+        'agent_prompt_title' => 'Prompt for en AI-agent',
+        'agent_prompt_trigger' => 'Hent AI-prompt',
+        'agent_prompt_label' => 'Kopier denne fullstendige instruksjonen',
+        'agent_prompt' => 'Opprett gyldig JSON for å importere medlemmer. Returner kun JSON uten Markdown. Bruk en members-tabell med name, email og phone. name er obligatorisk. email og phone er valgfritt. Eksisterende medlemmer matches på email. Ikke gjenta en email i samme import, og bruk maksimalt 100 medlemmer.',
+        'close' => 'Lukk',
+        'submit' => 'Importer medlemmer',
+        'validation' => [
+            'invalid_json' => 'Skriv inn et gyldig JSON-objekt som inneholder en members-tabell.',
+            'members_array' => 'Verdien i members må være en tabell.',
+            'duplicate_email' => 'Hver e-postadresse kan bare forekomme én gang i en import.',
+        ],
+        'messages' => [
+            'completed' => 'Import fullført: :created opprettet, :updated oppdatert.',
+        ],
+    ],
     'messages' => [
         'created' => 'Medlemmet er lagt til.',
         'updated' => 'Medlemmet er oppdatert.',
