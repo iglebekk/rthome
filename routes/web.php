@@ -43,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/clubs/{club}/dashboard', [DashboardController::class, 'show'])->name('clubs.dashboard');
     Route::get('/clubs/{club}/settings/events', [ClubController::class, 'settingsEvents'])->name('clubs.settings.events');
     Route::post('/clubs/{club}/settings/events/import', [ClubController::class, 'importEvents'])->name('clubs.settings.events.import');
+    Route::get('/clubs/{club}/settings/members', [ClubController::class, 'settingsMembers'])->name('clubs.settings.members');
+    Route::post('/clubs/{club}/settings/members/import', [ClubController::class, 'importMembers'])->name('clubs.settings.members.import');
     Route::get('/clubs/{club}/settings/invitations', [ClubInvitationController::class, 'index'])->name('clubs.settings.invitations');
     Route::post('/clubs/{club}/settings/invitations', [ClubInvitationController::class, 'store'])->name('clubs.settings.invitations.store');
     Route::delete('/club-invitations/{invitation}', [ClubInvitationController::class, 'destroy'])->name('club-invitations.destroy');

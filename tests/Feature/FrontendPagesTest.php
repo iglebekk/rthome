@@ -146,14 +146,17 @@ test('club settings submenu renders with the correct state and destination', fun
     $club = Club::factory()->create();
     Member::factory()->for($club)->for($user)->create();
 
-    foreach ([
-        'closed' => [route('clubs.dashboard', $club), 'false'],
-        'open on club details' => [route('clubs.edit', $club), 'true'],
-    ] as [$url, $settingsOpen]) {
+    foreach (
+        [
+            'closed' => [route('clubs.dashboard', $club), 'false'],
+            'open on club details' => [route('clubs.edit', $club), 'true'],
+        ] as [$url, $settingsOpen]
+    ) {
         $this->actingAs($user)->get($url)
             ->assertSuccessful()
             ->assertSee(__('app.navigation.settings'))
             ->assertSee(__('app.navigation.club_details'))
+            ->assertSee(__('app.navigation.import_events'))
             ->assertSee('x-data="{ settingsOpen: '.$settingsOpen.' }"', false)
             ->assertSee('href="'.route('clubs.edit', $club).'"', false);
     }
