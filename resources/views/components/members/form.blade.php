@@ -15,6 +15,7 @@
                 data-brreg-lookup-url="{{ route('clubs.brreg-entities.show', [$club, 'ORGANIZATION_NUMBER']) }}"
                 data-brreg-loading-label="{{ __('members.invoice.lookup_loading') }}"
                 data-brreg-required-message="{{ __('members.invoice.lookup_required') }}"
+                data-brreg-unavailable-message="{{ __('members.invoice.lookup_unavailable') }}"
                 data-brreg-confirmation="{{ __('members.invoice.lookup_confirmation') }}"
             >{{ __('members.invoice.lookup') }}</x-app.button>
             <x-app.alert variant="danger" hidden data-brreg-error></x-app.alert>

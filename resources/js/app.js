@@ -81,7 +81,9 @@ document.addEventListener('click', async (event) => {
         const body = await response.json();
 
         if (! response.ok) {
-            throw new Error(body.message);
+            showBrregError(errorElement, body.message ?? button.dataset.brregUnavailableMessage);
+
+            return;
         }
 
         const fields = Object.entries(body.data);
@@ -100,11 +102,8 @@ document.addEventListener('click', async (event) => {
                 input.value = value ?? '';
             }
         });
-    } catch (error) {
-        showBrregError(
-            errorElement,
-            error instanceof Error ? error.message : button.dataset.brregRequiredMessage,
-        );
+    } catch {
+        showBrregError(errorElement, button.dataset.brregUnavailableMessage);
     } finally {
         button.disabled = false;
         button.textContent = originalLabel;
