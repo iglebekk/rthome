@@ -10,7 +10,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['club_id', 'user_id', 'name', 'email', 'phone'])]
+#[Fillable([
+    'club_id',
+    'user_id',
+    'name',
+    'email',
+    'phone',
+    'invoice_company_name',
+    'invoice_organization_number',
+    'invoice_address',
+    'invoice_postal_code',
+    'invoice_city',
+])]
 class Member extends Model
 {
     /** @use HasFactory<MemberFactory> */

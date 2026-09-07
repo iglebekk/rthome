@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\IdentifyAccountController;
 use App\Http\Controllers\Auth\MemberActivationController;
+use App\Http\Controllers\BrregEntityController;
 use App\Http\Controllers\ClubController;
 use App\Http\Controllers\ClubInvitationController;
 use App\Http\Controllers\DashboardController;
@@ -49,6 +50,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('/clubs/{club}/settings/invitations', [ClubInvitationController::class, 'store'])->name('clubs.settings.invitations.store');
     Route::delete('/club-invitations/{invitation}', [ClubInvitationController::class, 'destroy'])->name('club-invitations.destroy');
     Route::post('/join/{token}/confirm', [ClubInvitationController::class, 'confirm'])->name('club-invitations.confirm');
+    Route::get('/clubs/{club}/brreg-entities/{organizationNumber}', BrregEntityController::class)
+        ->middleware('throttle:30,1')
+        ->name('clubs.brreg-entities.show');
     Route::resource('clubs.members', MemberController::class)->except('show');
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);

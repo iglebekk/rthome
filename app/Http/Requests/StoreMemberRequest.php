@@ -45,6 +45,24 @@ class StoreMemberRequest extends FormRequest
                     ->where(fn (Builder $query): Builder => $query->where('club_id', $clubId)),
             ],
             'phone' => ['nullable', 'string', 'max:50'],
+            'invoice_company_name' => ['nullable', 'string', 'max:255'],
+            'invoice_organization_number' => ['nullable', 'digits:9'],
+            'invoice_address' => ['nullable', 'string', 'max:255'],
+            'invoice_postal_code' => ['nullable', 'string', 'max:20'],
+            'invoice_city' => ['nullable', 'string', 'max:255'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $organizationNumber = preg_replace(
+            '/\\s+/',
+            '',
+            $this->string('invoice_organization_number')->toString(),
+        );
+
+        $this->merge([
+            'invoice_organization_number' => $organizationNumber === '' ? null : $organizationNumber,
+        ]);
     }
 }

@@ -37,3 +37,15 @@ test('selected locale is used for authenticated layouts and dates', function () 
         ->assertSee('<html lang="nb">', false)
         ->assertSee('jan 15, 2030 · 16:00');
 });
+
+test('invoice settings are displayed in Norwegian for Norwegian browser locales', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    Member::factory()->for($club)->for($user)->create();
+
+    $this->actingAs($user)
+        ->get(route('clubs.members.create', $club), ['Accept-Language' => 'nb-NO'])
+        ->assertSee('Fakturainnstillinger')
+        ->assertSee('Bedriftsnavn')
+        ->assertSee('Hent fra Brønnøysundregistrene');
+});
