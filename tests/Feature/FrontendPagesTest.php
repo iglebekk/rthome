@@ -1,9 +1,13 @@
 <?php
 
+use App\Enums\InvoiceCreationStatus;
 use App\Models\Club;
 use App\Models\Event;
+use App\Models\Invoice;
+use App\Models\InvoiceCreation;
 use App\Models\Member;
 use App\Models\Position;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
@@ -27,6 +31,14 @@ test('every club administration page renders on desktop-compatible markup', func
     $member = Member::factory()->for($club)->for($user)->create();
     $position = Position::factory()->for($club)->for($member)->create();
     $event = Event::factory()->for($club)->create();
+    $product = Product::factory()->for($club)->create();
+    $invoiceCreation = InvoiceCreation::factory()->for($club)->create([
+        'status' => InvoiceCreationStatus::Issued,
+        'invoice_date' => now()->toDateString(),
+        'due_date' => now()->addDays(14)->toDateString(),
+        'issued_at' => now(),
+    ]);
+    $invoice = Invoice::factory()->for($club)->for($member)->create();
 
     $pages = [
         [route('clubs.dashboard', $club), __('dashboard.description')],
@@ -40,6 +52,13 @@ test('every club administration page renders on desktop-compatible markup', func
         [route('clubs.events.create', $club), __('events.create_title')],
         [route('clubs.events.show', [$club, $event]), __('events.view_title')],
         [route('clubs.events.edit', [$club, $event]), __('events.edit_title')],
+        [route('clubs.products.index', $club), __('products.title')],
+        [route('clubs.products.create', $club), __('products.create_title')],
+        [route('clubs.products.edit', [$club, $product]), __('products.edit_title')],
+        [route('clubs.invoices.index', $club), __('invoices.title')],
+        [route('clubs.invoice-creations.create', $club), __('invoices.create_title')],
+        [route('clubs.invoice-creations.show', [$club, $invoiceCreation]), __('invoices.created_title')],
+        [route('clubs.invoices.show', [$club, $invoice]), (string) $invoice->number],
         [route('clubs.edit', $club), __('clubs.settings.title')],
         [route('clubs.settings.events', $club), __('clubs.settings.events.title')],
         [route('profile.show'), __('profile.title')],
@@ -145,19 +164,25 @@ test('club settings submenu renders with the correct state and destination', fun
     $user = User::factory()->create();
     $club = Club::factory()->create();
     Member::factory()->for($club)->for($user)->create();
+    $product = Product::factory()->for($club)->create();
 
     foreach (
         [
             'closed' => [route('clubs.dashboard', $club), 'false'],
             'open on club details' => [route('clubs.edit', $club), 'true'],
+            'open on product list' => [route('clubs.products.index', $club), 'true'],
+            'open while creating a product' => [route('clubs.products.create', $club), 'true'],
+            'open while editing a product' => [route('clubs.products.edit', [$club, $product]), 'true'],
         ] as [$url, $settingsOpen]
     ) {
         $this->actingAs($user)->get($url)
             ->assertSuccessful()
             ->assertSee(__('app.navigation.settings'))
             ->assertSee(__('app.navigation.club_details'))
+            ->assertSee(__('app.navigation.products'))
             ->assertSee(__('app.navigation.import_events'))
             ->assertSee('x-data="{ settingsOpen: '.$settingsOpen.' }"', false)
+            ->assertSee('href="'.route('clubs.products.index', $club).'"', false)
             ->assertSee('href="'.route('clubs.edit', $club).'"', false);
     }
 });

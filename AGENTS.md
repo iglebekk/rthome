@@ -173,3 +173,8 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 Følg prinsippene i [`docs/laravel-prinsipper.md`](docs/laravel-prinsipper.md). Den fila er kilden — ikke dupliser innholdet her.
 <!-- LARAVEL-PRINSIPPER:END -->
+
+## Local development
+
+- This project runs through Laravel Valet at `http://rthome.test`.
+- Use the Valet URL for manual browser verification. Do not start `php artisan serve` for this project.

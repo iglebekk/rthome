@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Fillable(['name'])]
+#[Fillable(['name', 'organization_number', 'invoice_sequence'])]
 class Club extends Model
 {
     /** @use HasFactory<ClubFactory> */
@@ -40,6 +40,21 @@ class Club extends Model
         return $this->hasMany(ClubInvitation::class);
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function invoiceCreations(): HasMany
+    {
+        return $this->hasMany(InvoiceCreation::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function users(): HasManyThrough
     {
         return $this->hasManyThrough(
@@ -55,6 +70,10 @@ class Club extends Model
     protected static function booted(): void
     {
         static::deleting(function (Club $club): void {
+            if ($club->invoices()->exists()) {
+                throw new \LogicException('A club with invoices cannot be deleted.');
+            }
+
             $club->links()->eachById(
                 function (Link $link): void {
                     $link->delete();

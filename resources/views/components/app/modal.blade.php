@@ -1,6 +1,6 @@
 @props(['name', 'title', 'triggerLabel'])
 
-<x-app.button type="button" x-on:click="$flux.modal('{{ $name }}').show()">{{ $triggerLabel }}</x-app.button>
+<x-app.button type="button" x-on:click="$flux.modal('{{ $name }}').show()" data-modal-trigger="{{ $name }}">{{ $triggerLabel }}</x-app.button>
 
 <flux:modal :$name class="w-[min(56rem,calc(100vw-2rem))]" scroll="body">
     <x-app.section class="gap-5">

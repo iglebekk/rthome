@@ -1,4 +1,4 @@
-@props(['name', 'title', 'description', 'confirmLabel', 'action', 'method' => 'DELETE'])
+@props(['name', 'title', 'description', 'confirmLabel', 'action', 'method' => 'DELETE', 'confirmVariant' => 'danger'])
 
 <span x-on:click="$flux.modal('{{ $name }}').show()">{{ $trigger }}</span>
 <flux:modal :$name class="md:w-md">
@@ -9,7 +9,7 @@
             @isset($fields){{ $fields }}@endisset
             <x-form.actions>
                 <x-app.button variant="ghost" x-on:click="$flux.modal('{{ $name }}').close()">{{ __('app.actions.cancel') }}</x-app.button>
-                <x-app.button type="submit" variant="danger">{{ $confirmLabel }}</x-app.button>
+                <x-app.button type="submit" :variant="$confirmVariant">{{ $confirmLabel }}</x-app.button>
             </x-form.actions>
         </x-form>
     </div>

@@ -4,6 +4,7 @@ use App\Models\Club;
 use App\Models\ClubInvitation;
 use App\Models\Member;
 use App\Models\Position;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
@@ -113,6 +114,46 @@ test('a Brreg network failure shows a localized error', function () {
         ->click(__('members.invoice.lookup'))
         ->assertSee(__('members.invoice.lookup_unavailable'))
         ->assertDontSee('Failed to fetch')
+        ->assertNoJavaScriptErrors()
+        ->assertNoConsoleLogs();
+});
+
+test('invoice creation updates recipients products totals and submit text without JavaScript errors', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create(['organization_number' => '912345678']);
+    $firstMember = Member::factory()->for($club)->for($user)->create(['name' => 'First Member']);
+    $secondMember = Member::factory()->for($club)->create(['name' => 'Second Member']);
+    $product = Product::factory()->for($club)->create([
+        'name' => 'Annual membership',
+        'gross_price_ore' => 50000,
+    ]);
+    $secondProduct = Product::factory()->for($club)->create([
+        'name' => 'Workshop ticket',
+        'gross_price_ore' => 25000,
+    ]);
+
+    $this->actingAs($user);
+
+    visit(route('clubs.invoice-creations.create', $club))
+        ->click(__('invoices.actions.add_recipient'))
+        ->click($firstMember->name)
+        ->click(__('invoices.actions.add_selected'))
+        ->click(__('invoices.actions.add_recipient'))
+        ->click($secondMember->name)
+        ->click(__('invoices.actions.add_selected'))
+        ->assertScript("document.querySelectorAll('[data-invoice-recipient]').length === 2")
+        ->assertSee(__('invoices.actions.issue_many', ['count' => 2]))
+        ->assertScript(
+            "(() => { document.querySelector('[data-modal-trigger=invoice-products]').click(); return true; })()",
+        )
+        ->assertScript("(() => { document.querySelector('[data-picker-option=\"product\"][data-picker-id=\"{$product->getKey()}\"]').click(); document.querySelector('[data-picker-option=\"product\"][data-picker-id=\"{$secondProduct->getKey()}\"]').click(); return true; })()")
+        ->assertScript("(() => { document.querySelector('[data-add-selected-products]').click(); return true; })()")
+        ->assertScript("document.querySelectorAll('[data-invoice-line]').length === 2")
+        ->assertScript(
+            "(() => { const quantity = document.querySelector('[data-line-quantity]'); quantity.value = '2'; quantity.dispatchEvent(new Event('input', { bubbles: true })); return document.querySelector('[data-invoice-total]').textContent.includes('1,250') || document.querySelector('[data-invoice-total]').textContent.includes('1 250'); })()",
+        )
+        ->assertScript("(() => { document.querySelectorAll('[data-remove-invoice-line]')[1].click(); document.querySelectorAll('[data-remove-invoice-recipient]')[1].click(); return document.querySelectorAll('[data-invoice-line]').length === 1 && document.querySelectorAll('[data-invoice-recipient]').length === 1; })()")
+        ->assertSee(__('invoices.actions.issue_one'))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
 });

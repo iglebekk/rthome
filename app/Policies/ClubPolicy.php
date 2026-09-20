@@ -19,7 +19,7 @@ class ClubPolicy
 
     public function delete(User $user, Club $club): bool
     {
-        return $this->isMember($user, $club);
+        return $this->isMember($user, $club) && ! $club->invoices()->exists();
     }
 
     private function isMember(User $user, Club $club): bool

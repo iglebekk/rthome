@@ -17,6 +17,8 @@ return [
         'club_details' => 'Klubbdetaljer',
         'member_import' => 'Importer medlemmer',
         'invitations' => 'Invitasjoner',
+        'products' => 'Produkter',
+        'invoices' => 'Fakturaer',
         'settings_toggle' => 'Vis klubbinnstillinger',
         'profile' => 'Profil og sikkerhet',
         'back_to_club' => 'Tilbake til klubben',

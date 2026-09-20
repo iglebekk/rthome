@@ -20,7 +20,13 @@ class MemberPolicy
 
     public function delete(User $user, Member $member): bool
     {
-        return $this->isMemberOfClub($user, $member->club_id);
+        if (! $this->isMemberOfClub($user, $member->club_id)) {
+            return false;
+        }
+
+        $club = $member->club()->withCount(['members', 'invoices'])->first();
+
+        return $club !== null && ! ($club->members_count === 1 && $club->invoices_count > 0);
     }
 
     private function isMemberOfClub(User $user, int $clubId): bool

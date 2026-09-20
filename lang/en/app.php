@@ -17,6 +17,8 @@ return [
         'club_details' => 'Club details',
         'member_import' => 'Import members',
         'invitations' => 'Invitations',
+        'products' => 'Products',
+        'invoices' => 'Invoices',
         'settings_toggle' => 'Toggle club settings menu',
         'profile' => 'Profile and security',
         'back_to_club' => 'Back to club',

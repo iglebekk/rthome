@@ -7,9 +7,12 @@ use App\Http\Controllers\ClubController;
 use App\Http\Controllers\ClubInvitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoiceCreationController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,4 +60,15 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);
     Route::resource('clubs.links', LinkController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('clubs.products', ProductController::class);
+    Route::resource('clubs.invoice-creations', InvoiceCreationController::class)
+        ->only(['create', 'store', 'show', 'edit', 'update', 'destroy'])
+        ->parameters(['invoice-creations' => 'invoiceCreation']);
+    Route::get('/clubs/{club}/invoices', [InvoiceController::class, 'index'])->name('clubs.invoices.index');
+    Route::get('/clubs/{club}/invoices/{invoice}', [InvoiceController::class, 'show'])->name('clubs.invoices.show');
+    Route::get('/clubs/{club}/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('clubs.invoices.download');
+    Route::post('/clubs/{club}/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('clubs.invoices.send');
+    Route::post('/clubs/{club}/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('clubs.invoices.mark-paid');
+    Route::post('/clubs/{club}/invoices/{invoice}/unmark-paid', [InvoiceController::class, 'unmarkPaid'])->name('clubs.invoices.unmark-paid');
+    Route::post('/clubs/{club}/invoices/{invoice}/credit', [InvoiceController::class, 'credit'])->name('clubs.invoices.credit');
 });

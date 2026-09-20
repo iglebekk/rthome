@@ -30,7 +30,10 @@
             <a href="{{ route('clubs.links.index', $club) }}" class="app-nav-link">
                 <flux:icon name="link" class="size-5" />{{ __('app.navigation.links') }}
             </a>
-            <div x-data="{ settingsOpen: {{ request()->routeIs('clubs.edit', 'clubs.settings.events', 'clubs.settings.members', 'clubs.settings.invitations') ? 'true' : 'false' }} }" x-id="['club-settings-menu']">
+            <a href="{{ route('clubs.invoices.index', $club) }}" class="app-nav-link">
+                <flux:icon name="document-text" class="size-5" />{{ __('app.navigation.invoices') }}
+            </a>
+            <div x-data="{ settingsOpen: {{ request()->routeIs('clubs.edit', 'clubs.settings.events', 'clubs.settings.members', 'clubs.settings.invitations', 'clubs.products.*') ? 'true' : 'false' }} }" x-id="['club-settings-menu']">
                 <x-app.button x-on:click="settingsOpen = !settingsOpen" x-bind:aria-expanded="settingsOpen"
                     x-bind:aria-controls="$id('club-settings-menu')"
                     aria-label="{{ __('app.navigation.settings_toggle') }}" data-test="club-settings-trigger"
@@ -42,6 +45,9 @@
                     class="grid gap-1 pt-1">
                     <a href="{{ route('clubs.edit', $club) }}" class="app-nav-link pl-11">
                         <flux:icon name="building-office-2" class="size-5" />{{ __('app.navigation.club_details') }}
+                    </a>
+                    <a href="{{ route('clubs.products.index', $club) }}" class="app-nav-link pl-11">
+                        <flux:icon name="cube" class="size-5" />{{ __('app.navigation.products') }}
                     </a>
                     <a href="{{ route('clubs.settings.events', $club) }}" class="app-nav-link pl-11">
                         <flux:icon name="calendar-days" class="size-5" />{{ __('app.navigation.import_events') }}
