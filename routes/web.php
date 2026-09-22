@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceCreationController;
+use App\Http\Controllers\InvoiceExportDownloadController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PositionController;
@@ -65,6 +66,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         ->only(['create', 'store', 'show', 'edit', 'update', 'destroy'])
         ->parameters(['invoice-creations' => 'invoiceCreation']);
     Route::get('/clubs/{club}/invoices', [InvoiceController::class, 'index'])->name('clubs.invoices.index');
+    Route::post('/clubs/{club}/invoices/bulk-send', [InvoiceController::class, 'bulkSend'])->name('clubs.invoices.bulk-send');
+    Route::post('/clubs/{club}/invoices/exports', [InvoiceController::class, 'export'])->name('clubs.invoices.exports.store');
     Route::get('/clubs/{club}/invoices/{invoice}', [InvoiceController::class, 'show'])->name('clubs.invoices.show');
     Route::get('/clubs/{club}/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('clubs.invoices.download');
     Route::post('/clubs/{club}/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('clubs.invoices.send');
@@ -72,3 +75,6 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('/clubs/{club}/invoices/{invoice}/unmark-paid', [InvoiceController::class, 'unmarkPaid'])->name('clubs.invoices.unmark-paid');
     Route::post('/clubs/{club}/invoices/{invoice}/credit', [InvoiceController::class, 'credit'])->name('clubs.invoices.credit');
 });
+
+Route::get('/invoice-exports/{invoiceExport:download_token}/download', InvoiceExportDownloadController::class)
+    ->name('invoice-exports.download');

@@ -32,5 +32,6 @@ return [
         'back' => 'Go back',
         'continue' => 'Continue',
         'search' => 'Search',
+        'actions' => 'Actions',
     ],
 ];

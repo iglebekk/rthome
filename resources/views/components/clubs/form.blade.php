@@ -5,6 +5,7 @@
         <x-form.input name="name" :label="__('clubs.settings.name')" :value="old('name', $club?->name)" required autofocus />
         <x-app.section :title="__('clubs.settings.invoice_title')" :description="__('clubs.settings.invoice_description')">
             <x-form.input name="organization_number" :label="__('clubs.settings.organization_number')" :value="old('organization_number', $club?->organization_number)" inputmode="numeric" autocomplete="off" />
+            <x-form.input name="account_number" :label="__('clubs.settings.account_number')" :value="old('account_number', $club?->account_number)" inputmode="numeric" autocomplete="off" />
         </x-app.section>
         <x-form.actions>
             @if ($club)<x-app.link-button :href="route('clubs.dashboard', $club)" variant="ghost">{{ __('app.actions.cancel') }}</x-app.link-button>@endif

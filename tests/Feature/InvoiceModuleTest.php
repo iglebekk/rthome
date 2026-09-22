@@ -18,10 +18,13 @@ use Illuminate\Support\Str;
 
 uses(LazilyRefreshDatabase::class);
 
-function invoiceClubContext(bool $withOrganizationNumber = true): array
+function invoiceClubContext(bool $withOrganizationNumber = true, bool $withAccountNumber = true): array
 {
     $user = User::factory()->create();
-    $club = Club::factory()->create(['organization_number' => $withOrganizationNumber ? '912345678' : null]);
+    $club = Club::factory()->create([
+        'organization_number' => $withOrganizationNumber ? '912345678' : null,
+        'account_number' => $withAccountNumber ? '12345678903' : null,
+    ]);
     $firstMember = Member::factory()->for($club)->for($user)->create([
         'name' => 'First Member',
         'email' => 'first@example.com',
@@ -76,6 +79,7 @@ test('one request creates a numbered immutable invoice for every recipient', fun
     expect($invoice->gross_total_ore)->toBe(100000)
         ->and($invoice->net_total_ore)->toBe(80000)
         ->and($invoice->vat_total_ore)->toBe(20000)
+        ->and($invoice->club_account_number)->toBe($club->account_number)
         ->and($invoice->lines->sole()->description)->toBe('Annual membership')
         ->and($invoice->lines->sole()->gross_unit_price_ore)->toBe(50000);
 
@@ -105,7 +109,7 @@ test('repeating a submission token returns the original creation without duplica
         ->and($club->refresh()->invoice_sequence)->toBe(10001);
 });
 
-test('invoice creation validates recipients products dates and organization number', function () {
+test('invoice creation validates recipients products dates organization number and account number', function () {
     [$user, $club, $member] = invoiceClubContext();
     $product = Product::factory()->for($club)->create();
     $inactiveProduct = Product::factory()->for($club)->create(['is_active' => false]);
@@ -137,6 +141,12 @@ test('invoice creation validates recipients products dates and organization numb
         ->assertUnprocessable()
         ->assertJsonValidationErrors('organization_number');
 
+    $club->update(['organization_number' => '912345678', 'account_number' => null]);
+    $this->actingAs($user)
+        ->postJson(route('clubs.invoice-creations.store', $club), invoiceCreationPayload($member, $product))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('account_number');
+
     expect(Invoice::query()->count())->toBe(0);
 });
 
@@ -151,6 +161,19 @@ test('the invoice form shows the organization number error after issue validatio
     $this->followRedirects($response)
         ->assertSuccessful()
         ->assertSee(__('invoices.validation.organization_number'));
+});
+
+test('the invoice form shows the account number error after issue validation fails', function () {
+    [$user, $club, $member] = invoiceClubContext(withAccountNumber: false);
+    $product = Product::factory()->for($club)->create();
+
+    $response = $this->actingAs($user)
+        ->from(route('clubs.invoice-creations.create', $club))
+        ->post(route('clubs.invoice-creations.store', $club), invoiceCreationPayload($member, $product));
+
+    $this->followRedirects($response)
+        ->assertSuccessful()
+        ->assertSee(__('invoices.validation.account_number'));
 });
 
 test('invoice creation rejects cross club recipients and products', function () {

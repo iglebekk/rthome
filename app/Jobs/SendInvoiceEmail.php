@@ -26,11 +26,12 @@ class SendInvoiceEmail implements ShouldQueueAfterCommit
 
     public function __construct(
         public Invoice $invoice,
+        public bool $resend = false,
     ) {}
 
     public function handle(InvoicePdfService $pdfService): void
     {
-        if ($this->invoice->email_sent_at !== null) {
+        if ($this->invoice->email_sent_at !== null && ! $this->resend) {
             return;
         }
 

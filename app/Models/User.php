@@ -25,6 +25,11 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(Member::class);
     }
 
+    public function invoiceExports(): HasMany
+    {
+        return $this->hasMany(InvoiceExport::class);
+    }
+
     public function clubs(): HasManyThrough
     {
         return $this->hasManyThrough(

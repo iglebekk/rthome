@@ -54,6 +54,7 @@ it('renders an immutable invoice PDF to private storage', function (): void {
         'due_date' => '2026-09-30',
         'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
+        'club_account_number' => '12345678903',
         'recipient_name' => 'Ada Lovelace',
         'recipient_company_name' => null,
         'recipient_organization_number' => null,
@@ -73,6 +74,109 @@ it('renders an immutable invoice PDF to private storage', function (): void {
     Pdf::assertSaved(fn ($pdf, string $savedPath): bool => str_ends_with($savedPath, $path));
     Pdf::assertViewIs('pdfs.invoice');
     Pdf::assertViewHas('document');
+});
+
+it('renders an invoice PDF without a browser runtime', function (): void {
+    Storage::fake('local');
+
+    $invoice = (new Invoice)->forceFill([
+        'id' => 42,
+        'club_id' => 7,
+        'number' => 10001,
+        'document_type' => 'invoice',
+        'invoice_date' => '2026-09-16',
+        'due_date' => '2026-09-30',
+        'club_name' => 'Example Club',
+        'club_organization_number' => '123456789',
+        'club_account_number' => '12345678903',
+        'recipient_name' => 'Ada Lovelace',
+        'recipient_company_name' => null,
+        'recipient_organization_number' => null,
+        'recipient_address' => null,
+        'recipient_postal_code' => null,
+        'recipient_city' => null,
+        'net_total_ore' => 80000,
+        'vat_total_ore' => 20000,
+        'gross_total_ore' => 100000,
+    ]);
+    $invoice->setRelation('lines', new Collection);
+
+    $path = app(InvoicePdfService::class)->generate($invoice);
+
+    expect(Storage::disk('local')->get($path))->toStartWith('%PDF');
+});
+
+it('includes the club account number in the pdf document data', function (): void {
+    $invoice = (new Invoice)->forceFill([
+        'number' => 10001,
+        'document_type' => 'invoice',
+        'invoice_date' => '2026-09-16',
+        'due_date' => '2026-09-30',
+        'club_name' => 'Example Club',
+        'club_organization_number' => '123456789',
+        'club_account_number' => '12345678903',
+        'recipient_name' => 'Ada Lovelace',
+        'net_total_ore' => 80000,
+        'vat_total_ore' => 20000,
+        'gross_total_ore' => 100000,
+    ]);
+    $invoice->setRelation('lines', new Collection);
+
+    expect(app(InvoicePdfService::class)->document($invoice)['seller_account_number'])->toBe('12345678903');
+});
+
+it('falls back to the club current account number when an invoice has none of its own', function (): void {
+    $club = Club::factory()->create(['account_number' => '12345678903']);
+    $invoice = (new Invoice)->forceFill([
+        'number' => 10001,
+        'document_type' => 'invoice',
+        'invoice_date' => '2026-09-16',
+        'due_date' => '2026-09-30',
+        'club_name' => 'Example Club',
+        'club_organization_number' => '123456789',
+        'club_account_number' => null,
+        'recipient_name' => 'Ada Lovelace',
+        'net_total_ore' => 80000,
+        'vat_total_ore' => 20000,
+        'gross_total_ore' => 100000,
+    ]);
+    $invoice->setRelation('lines', new Collection);
+    $invoice->setRelation('club', $club);
+
+    expect(app(InvoicePdfService::class)->document($invoice)['seller_account_number'])->toBe('12345678903');
+});
+
+it('prefers its own snapshotted account number over the club current one', function (): void {
+    $club = Club::factory()->create(['account_number' => '22222222222']);
+    $invoice = (new Invoice)->forceFill([
+        'number' => 10001,
+        'document_type' => 'invoice',
+        'invoice_date' => '2026-09-16',
+        'due_date' => '2026-09-30',
+        'club_name' => 'Example Club',
+        'club_organization_number' => '123456789',
+        'club_account_number' => '11111111111',
+        'recipient_name' => 'Ada Lovelace',
+        'net_total_ore' => 80000,
+        'vat_total_ore' => 20000,
+        'gross_total_ore' => 100000,
+    ]);
+    $invoice->setRelation('lines', new Collection);
+    $invoice->setRelation('club', $club);
+
+    expect(app(InvoicePdfService::class)->document($invoice)['seller_account_number'])->toBe('11111111111');
+});
+
+it('shows the club current account number on the invoice page when an older invoice has none of its own', function (): void {
+    $user = User::factory()->create();
+    $club = Club::factory()->create(['account_number' => '12345678903']);
+    $member = Member::factory()->for($club)->for($user)->create();
+    $invoice = Invoice::factory()->for($club)->for($member)->create(['club_account_number' => null]);
+
+    $this->actingAs($user)
+        ->get(route('clubs.invoices.show', [$club, $invoice]))
+        ->assertSuccessful()
+        ->assertSee('12345678903');
 });
 
 it('does not send an invoice email a second time after it is marked sent', function (): void {

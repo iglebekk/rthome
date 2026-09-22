@@ -88,6 +88,7 @@ class CreateInvoicesAction
                     'issued_at' => now(),
                     'club_name' => $lockedClub->name,
                     'club_organization_number' => $lockedClub->organization_number,
+                    'club_account_number' => $lockedClub->account_number,
                     'recipient_name' => $member->invoice_company_name ?: $member->name,
                     'recipient_company_name' => $member->invoice_company_name,
                     'recipient_organization_number' => $member->invoice_organization_number,

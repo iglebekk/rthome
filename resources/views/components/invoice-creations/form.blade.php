@@ -29,6 +29,7 @@
                 <x-form.input name="due_date" type="date" :label="__('invoices.fields.due_date')" :value="$dueDate" />
             </div>
             <x-form.error name="organization_number" />
+            <x-form.error name="account_number" />
         </x-app.section>
     </x-app.card>
 

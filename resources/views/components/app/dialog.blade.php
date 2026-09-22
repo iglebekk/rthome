@@ -1,6 +1,8 @@
 @props(['name', 'title', 'description', 'confirmLabel', 'action', 'method' => 'DELETE', 'confirmVariant' => 'danger'])
 
-<span x-on:click="$flux.modal('{{ $name }}').show()">{{ $trigger }}</span>
+@isset($trigger)
+    <span x-on:click="$flux.modal('{{ $name }}').show()">{{ $trigger }}</span>
+@endisset
 <flux:modal :$name class="md:w-md">
     <div class="grid gap-5">
         <div class="grid gap-2"><flux:heading size="lg">{{ $title }}</flux:heading><flux:text>{{ $description }}</flux:text></div>

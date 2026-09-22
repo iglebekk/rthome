@@ -34,6 +34,7 @@ class InvoiceFactory extends Factory
             'issued_at' => now(),
             'club_name' => fake()->company(),
             'club_organization_number' => fake()->numerify('#########'),
+            'club_account_number' => fake()->numerify('###########'),
             'recipient_name' => fake()->name(),
             'recipient_company_name' => null,
             'recipient_organization_number' => null,

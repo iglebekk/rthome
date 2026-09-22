@@ -2,6 +2,7 @@
 
 use App\Models\Club;
 use App\Models\ClubInvitation;
+use App\Models\Invoice;
 use App\Models\Member;
 use App\Models\Position;
 use App\Models\Product;
@@ -83,6 +84,27 @@ test('a member can open the club settings submenu', function () {
         ->assertSee(__('app.navigation.club_details'))
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();
+});
+
+test('a member can select invoices and open the bulk email confirmation', function () {
+    config()->set('queue.default', 'database');
+
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    $member = Member::factory()->for($club)->for($user)->create();
+    Invoice::factory()->for($club)->for($member)->count(2)->create();
+
+    $this->actingAs($user);
+
+    visit(route('clubs.invoices.index', $club))
+        ->assertScript("document.querySelector('[data-test=\"invoice-select-all\"]') !== null")
+        ->assertScript("Array.from(document.querySelectorAll('[data-invoice-selection]')).every((input) => /^\\d+$/.test(input.value))")
+        ->assertScript("(() => { const input = document.querySelector('[data-test=\"invoice-select-all\"] input, input[data-test=\"invoice-select-all\"]'); input.click(); return true; })()")
+        ->assertScript("document.querySelector('[data-test=\"invoice-selected-count\"]').textContent.includes('2')")
+        ->assertScript('window.confirm = () => true; true')
+        ->click('[data-test="invoice-bulk-send"]')
+        ->assertSee(trans_choice('invoices.messages.bulk_sent', 2, ['sent' => 2, 'skipped' => 0]))
+        ->assertNoJavaScriptErrors();
 });
 
 test('a member can copy an active invitation link', function () {
