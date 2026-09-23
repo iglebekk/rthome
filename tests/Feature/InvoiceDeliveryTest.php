@@ -219,6 +219,8 @@ it('stores the translated sent message in the flash session', function (): void 
 });
 
 it('queues invoice email work after the transaction commits', function (): void {
+    app()->setLocale('en');
+
     $invoice = (new Invoice)->forceFill(['number' => 10001]);
     $mailable = new InvoiceMailable($invoice, 'invoices/7/10001.pdf');
 
@@ -226,4 +228,68 @@ it('queues invoice email work after the transaction commits', function (): void 
         ->toBeInstanceOf(ShouldQueueAfterCommit::class)
         ->and($mailable->envelope()->subject)
         ->toBe('Invoice 10001');
+});
+
+it('renders the invoice mail subject in the current app locale', function (): void {
+    $invoice = (new Invoice)->forceFill(['number' => 10001]);
+
+    app()->setLocale('nb');
+    expect((new InvoiceMailable($invoice, 'invoices/7/10001.pdf'))->envelope()->subject)->toBe('Faktura 10001');
+
+    app()->setLocale('en');
+    expect((new InvoiceMailable($invoice, 'invoices/7/10001.pdf'))->envelope()->subject)->toBe('Invoice 10001');
+});
+
+it('renders locale-dependent pdf strings using the current app locale', function (): void {
+    $invoice = (new Invoice)->forceFill([
+        'number' => 10001,
+        'document_type' => 'invoice',
+        'invoice_date' => '2026-09-16',
+        'due_date' => '2026-09-30',
+        'club_name' => 'Example Club',
+        'club_organization_number' => '123456789',
+        'club_account_number' => '12345678903',
+        'recipient_name' => 'Ada Lovelace',
+        'net_total_ore' => 80000,
+        'vat_total_ore' => 20000,
+        'gross_total_ore' => 100000,
+    ]);
+    $invoice->setRelation('lines', new Collection);
+
+    app()->setLocale('nb');
+    expect(app(InvoicePdfService::class)->document($invoice)['document_type'])->toBe('Faktura');
+
+    app()->setLocale('en');
+    expect(app(InvoicePdfService::class)->document($invoice)['document_type'])->toBe('Invoice');
+});
+
+it('falls back to the club current locale when an invoice has none of its own', function (): void {
+    $club = Club::factory()->create(['locale' => 'nb']);
+    $invoice = (new Invoice)->forceFill(['club_locale' => null]);
+    $invoice->setRelation('club', $club);
+
+    $locale = $invoice->club_locale ?? $invoice->club?->locale ?? config('app.fallback_locale');
+
+    expect($locale)->toBe('nb');
+});
+
+it('sends the invoice using the club locale and restores the previous locale afterward', function (): void {
+    Mail::fake();
+    Storage::fake('local');
+    Pdf::fake();
+    app()->setLocale('en');
+
+    $user = User::factory()->create();
+    $club = Club::factory()->create(['locale' => 'nb']);
+    $member = Member::factory()->for($club)->for($user)->create();
+    $invoice = Invoice::factory()->for($club)->for($member)->create([
+        'club_locale' => 'nb',
+        'recipient_email' => 'ada@example.com',
+    ]);
+
+    (new SendInvoiceEmail($invoice))->handle(app(InvoicePdfService::class));
+
+    Pdf::assertSee('Faktura');
+    Mail::assertSent(InvoiceMailable::class, fn (InvoiceMailable $mail): bool => $mail->locale === 'nb');
+    expect(app()->getLocale())->toBe('en');
 });

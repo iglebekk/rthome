@@ -31,7 +31,7 @@ class ClubController extends Controller
     public function store(StoreClubRequest $request): RedirectResponse
     {
         $user = $request->user();
-        $club = Club::query()->create($request->validated());
+        $club = Club::query()->create([...$request->validated(), 'locale' => app()->getLocale()]);
 
         $club->members()->create([
             'user_id' => $user->getKey(),

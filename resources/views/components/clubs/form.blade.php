@@ -3,6 +3,9 @@
 <x-app.card>
     <x-form :action="$club ? route('clubs.update', $club) : route('clubs.store')" :method="$club ? 'PUT' : 'POST'">
         <x-form.input name="name" :label="__('clubs.settings.name')" :value="old('name', $club?->name)" required autofocus />
+        @if ($club)
+            <x-form.select name="locale" :label="__('clubs.settings.locale')" :options="__('clubs.settings.locale_options')" :value="old('locale', $club->locale)" required />
+        @endif
         <x-app.section :title="__('clubs.settings.invoice_title')" :description="__('clubs.settings.invoice_description')">
             <x-form.input name="organization_number" :label="__('clubs.settings.organization_number')" :value="old('organization_number', $club?->organization_number)" inputmode="numeric" autocomplete="off" />
             <x-form.input name="account_number" :label="__('clubs.settings.account_number')" :value="old('account_number', $club?->account_number)" inputmode="numeric" autocomplete="off" />

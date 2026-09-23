@@ -6,6 +6,8 @@ return [
         'title' => 'Klubbinnstillinger',
         'description' => 'Oppdater klubbnavnet eller fjern arbeidsområdet permanent.',
         'name' => 'Klubbnavn',
+        'locale' => 'Språk',
+        'locale_options' => ['nb' => 'Norsk (bokmål)', 'en' => 'English'],
         'invoice_title' => 'Fakturadetaljer',
         'invoice_description' => 'Legg inn organisasjonsnummer og kontonummer før fakturaer opprettes.',
         'organization_number' => 'Organisasjonsnummer',

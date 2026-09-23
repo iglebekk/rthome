@@ -80,6 +80,7 @@ test('one request creates a numbered immutable invoice for every recipient', fun
         ->and($invoice->net_total_ore)->toBe(80000)
         ->and($invoice->vat_total_ore)->toBe(20000)
         ->and($invoice->club_account_number)->toBe($club->account_number)
+        ->and($invoice->club_locale)->toBe($club->locale)
         ->and($invoice->lines->sole()->description)->toBe('Annual membership')
         ->and($invoice->lines->sole()->gross_unit_price_ore)->toBe(50000);
 

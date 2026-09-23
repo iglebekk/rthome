@@ -31,6 +31,22 @@ test('creating a club also creates its first member', function () {
         ->and($user->clubs()->sole()->is($club))->toBeTrue();
 });
 
+test('creating a club defaults its locale to the current browser language', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('clubs.store'), ['name' => 'Norsk Klubb'], ['Accept-Language' => 'nb-NO'])
+        ->assertRedirect();
+
+    expect(Club::query()->where('name', 'Norsk Klubb')->sole()->locale)->toBe('nb');
+
+    $this->actingAs($user)
+        ->post(route('clubs.store'), ['name' => 'English Club'])
+        ->assertRedirect();
+
+    expect(Club::query()->where('name', 'English Club')->sole()->locale)->toBe('en');
+});
+
 test('club creation validates its name', function (?string $name) {
     $user = User::factory()->create();
 

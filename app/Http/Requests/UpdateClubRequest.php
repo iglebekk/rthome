@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateClubRequest extends FormRequest
 {
@@ -34,6 +35,7 @@ class UpdateClubRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'organization_number' => ['nullable', 'digits:9'],
             'account_number' => ['nullable', 'digits:11'],
+            'locale' => ['sometimes', Rule::in(['nb', 'en'])],
         ];
     }
 }

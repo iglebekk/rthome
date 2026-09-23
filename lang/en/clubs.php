@@ -10,6 +10,8 @@ return [
         'title' => 'Club settings',
         'description' => 'Update the club name or permanently remove the workspace.',
         'name' => 'Club name',
+        'locale' => 'Language',
+        'locale_options' => ['nb' => 'Norwegian (bokmål)', 'en' => 'English'],
         'invoice_title' => 'Invoice details',
         'invoice_description' => 'Add the organization number and account number before generating invoices.',
         'organization_number' => 'Organization number',

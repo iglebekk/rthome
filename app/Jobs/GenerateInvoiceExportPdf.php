@@ -10,6 +10,8 @@ use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 
 class GenerateInvoiceExportPdf implements ShouldQueueAfterCommit
 {
@@ -32,7 +34,19 @@ class GenerateInvoiceExportPdf implements ShouldQueueAfterCommit
 
         $export = InvoiceExport::query()->findOrFail($this->invoiceExportId);
         $invoice = $export->club->invoices()->findOrFail($this->invoiceId);
+        $invoice->setRelation('club', $export->club);
 
-        $pdfService->generate($invoice);
+        $locale = $invoice->club_locale ?? $invoice->club?->locale ?? config('app.fallback_locale');
+        $previousLocale = App::getLocale();
+
+        try {
+            App::setLocale($locale);
+            Carbon::setLocale($locale);
+
+            $pdfService->generate($invoice);
+        } finally {
+            App::setLocale($previousLocale);
+            Carbon::setLocale($previousLocale);
+        }
     }
 }

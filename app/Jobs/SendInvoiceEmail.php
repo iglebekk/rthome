@@ -11,6 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Mail\PendingMail;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 use InvalidArgumentException;
 use Throwable;
@@ -41,12 +43,18 @@ class SendInvoiceEmail implements ShouldQueueAfterCommit
 
         $this->recordAttempt();
 
+        $locale = $this->invoice->club_locale ?? $this->invoice->club?->locale ?? config('app.fallback_locale');
+        $previousLocale = App::getLocale();
+
         try {
+            App::setLocale($locale);
+            Carbon::setLocale($locale);
+
             $path = $pdfService->generate($this->invoice);
 
             /** @var PendingMail $mail */
             $mail = Mail::to($this->invoice->recipient_email);
-            $mail->send(new InvoiceMailable($this->invoice, $path));
+            $mail->send((new InvoiceMailable($this->invoice, $path))->locale($locale));
 
             $this->invoice->forceFill([
                 'email_sent_at' => now(),
@@ -58,6 +66,9 @@ class SendInvoiceEmail implements ShouldQueueAfterCommit
             ])->saveQuietly();
 
             throw $exception;
+        } finally {
+            App::setLocale($previousLocale);
+            Carbon::setLocale($previousLocale);
         }
     }
 

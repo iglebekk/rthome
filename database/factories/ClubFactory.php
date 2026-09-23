@@ -21,6 +21,7 @@ class ClubFactory extends Factory
             'name' => fake()->unique()->company().' Club',
             'organization_number' => null,
             'account_number' => null,
+            'locale' => 'nb',
             'invoice_sequence' => 10000,
         ];
     }
