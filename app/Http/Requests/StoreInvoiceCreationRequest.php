@@ -83,6 +83,10 @@ class StoreInvoiceCreationRequest extends FormRequest
             $validator->errors()->add('organization_number', __('invoices.validation.organization_number'));
         }
 
+        if (! is_string($club->invoice_name) || $club->invoice_name === '') {
+            $validator->errors()->add('invoice_name', __('invoices.validation.invoice_name'));
+        }
+
         if (! is_string($club->account_number) || preg_match('/^\d{11}$/', $club->account_number) !== 1) {
             $validator->errors()->add('account_number', __('invoices.validation.account_number'));
         }

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LookupBrregEntityRequest extends FormRequest
+class UpdateMemberInvoiceDetailsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,8 +19,9 @@ class LookupBrregEntityRequest extends FormRequest
         }
 
         $club = $user->clubs()->findOrFail($this->route('club'));
+        $member = $club->members()->findOrFail($this->route('member'));
 
-        return $user->can('update', $club);
+        return $user->can('update', $member);
     }
 
     /**
@@ -41,7 +42,7 @@ class LookupBrregEntityRequest extends FormRequest
             'organization_number' => preg_replace(
                 '/\\s+/',
                 '',
-                (string) $this->route('organizationNumber'),
+                $this->string('organization_number')->toString(),
             ),
         ]);
     }

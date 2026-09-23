@@ -86,7 +86,6 @@ class CreateInvoicesAction
                     'invoice_date' => $data['invoice_date'],
                     'due_date' => $data['due_date'],
                     'issued_at' => now(),
-                    'club_name' => $lockedClub->name,
                     'club_organization_number' => $lockedClub->organization_number,
                     'club_account_number' => $lockedClub->account_number,
                     'club_locale' => $lockedClub->locale,

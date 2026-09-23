@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Fillable(['name', 'organization_number', 'account_number', 'locale', 'invoice_sequence'])]
+#[Fillable(['name', 'organization_number', 'invoice_name', 'account_number', 'locale', 'invoice_sequence'])]
 class Club extends Model
 {
     /** @use HasFactory<ClubFactory> */

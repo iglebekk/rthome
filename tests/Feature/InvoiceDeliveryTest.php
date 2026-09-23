@@ -52,7 +52,6 @@ it('renders an immutable invoice PDF to private storage', function (): void {
         'document_type' => 'invoice',
         'invoice_date' => '2026-09-16',
         'due_date' => '2026-09-30',
-        'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
         'club_account_number' => '12345678903',
         'recipient_name' => 'Ada Lovelace',
@@ -86,7 +85,6 @@ it('renders an invoice PDF without a browser runtime', function (): void {
         'document_type' => 'invoice',
         'invoice_date' => '2026-09-16',
         'due_date' => '2026-09-30',
-        'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
         'club_account_number' => '12345678903',
         'recipient_name' => 'Ada Lovelace',
@@ -112,7 +110,6 @@ it('includes the club account number in the pdf document data', function (): voi
         'document_type' => 'invoice',
         'invoice_date' => '2026-09-16',
         'due_date' => '2026-09-30',
-        'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
         'club_account_number' => '12345678903',
         'recipient_name' => 'Ada Lovelace',
@@ -125,6 +122,31 @@ it('includes the club account number in the pdf document data', function (): voi
     expect(app(InvoicePdfService::class)->document($invoice)['seller_account_number'])->toBe('12345678903');
 });
 
+it('always shows the club current invoice name instead of a per-invoice snapshot', function (): void {
+    $club = Club::factory()->create(['invoice_name' => 'Original Name AS']);
+    $invoice = (new Invoice)->forceFill([
+        'number' => 10001,
+        'document_type' => 'invoice',
+        'invoice_date' => '2026-09-16',
+        'due_date' => '2026-09-30',
+        'club_organization_number' => '123456789',
+        'club_account_number' => '12345678903',
+        'recipient_name' => 'Ada Lovelace',
+        'net_total_ore' => 80000,
+        'vat_total_ore' => 20000,
+        'gross_total_ore' => 100000,
+    ]);
+    $invoice->setRelation('lines', new Collection);
+    $invoice->setRelation('club', $club);
+
+    expect(app(InvoicePdfService::class)->document($invoice)['seller_name'])->toBe('Original Name AS');
+
+    $club->update(['invoice_name' => 'Renamed AS']);
+    $invoice->setRelation('club', $club->fresh());
+
+    expect(app(InvoicePdfService::class)->document($invoice)['seller_name'])->toBe('Renamed AS');
+});
+
 it('falls back to the club current account number when an invoice has none of its own', function (): void {
     $club = Club::factory()->create(['account_number' => '12345678903']);
     $invoice = (new Invoice)->forceFill([
@@ -132,7 +154,6 @@ it('falls back to the club current account number when an invoice has none of it
         'document_type' => 'invoice',
         'invoice_date' => '2026-09-16',
         'due_date' => '2026-09-30',
-        'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
         'club_account_number' => null,
         'recipient_name' => 'Ada Lovelace',
@@ -153,7 +174,6 @@ it('prefers its own snapshotted account number over the club current one', funct
         'document_type' => 'invoice',
         'invoice_date' => '2026-09-16',
         'due_date' => '2026-09-30',
-        'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
         'club_account_number' => '11111111111',
         'recipient_name' => 'Ada Lovelace',
@@ -246,7 +266,6 @@ it('renders locale-dependent pdf strings using the current app locale', function
         'document_type' => 'invoice',
         'invoice_date' => '2026-09-16',
         'due_date' => '2026-09-30',
-        'club_name' => 'Example Club',
         'club_organization_number' => '123456789',
         'club_account_number' => '12345678903',
         'recipient_name' => 'Ada Lovelace',

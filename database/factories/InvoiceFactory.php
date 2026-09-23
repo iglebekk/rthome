@@ -32,7 +32,6 @@ class InvoiceFactory extends Factory
             'invoice_date' => now()->toDateString(),
             'due_date' => now()->addDays(14)->toDateString(),
             'issued_at' => now(),
-            'club_name' => fake()->company(),
             'club_organization_number' => fake()->numerify('#########'),
             'club_account_number' => fake()->numerify('###########'),
             'club_locale' => 'nb',

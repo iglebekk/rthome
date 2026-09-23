@@ -27,11 +27,6 @@ test('a club member can add and update a member', function () {
         'name' => 'New Member',
         'email' => 'New.Member@example.com',
         'phone' => '+47 999 99 999',
-        'invoice_company_name' => 'Acme AS',
-        'invoice_organization_number' => '987 654 321',
-        'invoice_address' => 'Invoice Street 1',
-        'invoice_postal_code' => '0150',
-        'invoice_city' => 'Oslo',
     ])->assertRedirectToRoute('clubs.members.index', $club);
 
     $member = $club->members()->where('email', 'new.member@example.com')->sole();
@@ -40,20 +35,12 @@ test('a club member can add and update a member', function () {
         'name' => 'Updated Member',
         'email' => 'new.member@example.com',
         'phone' => null,
-        'invoice_company_name' => 'Updated Acme AS',
-        'invoice_organization_number' => '987654321',
-        'invoice_address' => 'Invoice Street 2',
-        'invoice_postal_code' => '5003',
-        'invoice_city' => 'Bergen',
     ])->assertRedirectToRoute('clubs.members.index', $club);
 
     expect($member->refresh()->name)->toBe('Updated Member')
-        ->and($member->phone)->toBeNull()
-        ->and($member->invoice_company_name)->toBe('Updated Acme AS')
-        ->and($member->invoice_organization_number)->toBe('987654321')
-        ->and($member->invoice_address)->toBe('Invoice Street 2')
-        ->and($member->invoice_postal_code)->toBe('5003')
-        ->and($member->invoice_city)->toBe('Bergen');
+        ->and($member->phone)->toBeNull();
+
+    // Invoice details are no longer settable through this form — see MemberInvoiceDetailsTest.
 });
 
 test('member writes validate input and hide clubs outside the current user memberships', function () {
@@ -63,15 +50,14 @@ test('member writes validate input and hide clubs outside the current user membe
     $this->actingAs($user)->post(route('clubs.members.store', $club), [
         'name' => null,
         'email' => 'invalid',
-        'invoice_organization_number' => '123',
-    ])->assertSessionHasErrors(['name', 'email', 'invoice_organization_number']);
+    ])->assertSessionHasErrors(['name', 'email']);
 
     $this->actingAs($user)->post(route('clubs.members.store', $otherClub), [
         'name' => 'Hidden',
     ])->assertNotFound();
 });
 
-test('invoice settings are optional when adding a member', function () {
+test('a member is created without invoice details', function () {
     [$user, $club] = createAdministrationContext();
 
     $this->actingAs($user)
@@ -87,15 +73,21 @@ test('invoice settings are optional when adding a member', function () {
         ->and($member->invoice_city)->toBeNull();
 });
 
-test('the member form renders invoice settings and the Brreg lookup control', function () {
-    [$user, $club] = createAdministrationContext();
+test('the member edit page renders invoice settings and the Brreg lookup modal, unlike the create page', function () {
+    [$user, $club, $member] = createAdministrationContext();
+
+    $this->actingAs($user)
+        ->get(route('clubs.members.edit', [$club, $member]))
+        ->assertSee(__('members.invoice.title'))
+        ->assertSee(__('members.invoice.description'))
+        ->assertSee(__('members.invoice.organization_number_add'))
+        ->assertSee(route('clubs.brreg-entities.show', [$club, 'ORGANIZATION_NUMBER']), false)
+        ->assertSee(route('clubs.members.invoice-details.update', [$club, $member]), false);
 
     $this->actingAs($user)
         ->get(route('clubs.members.create', $club))
-        ->assertSee(__('members.invoice.title'))
-        ->assertSee(__('members.invoice.description'))
-        ->assertSee(__('members.invoice.lookup'))
-        ->assertSee(route('clubs.brreg-entities.show', [$club, 'ORGANIZATION_NUMBER']), false);
+        ->assertDontSee(__('members.invoice.title'))
+        ->assertDontSee(route('clubs.brreg-entities.show', [$club, 'ORGANIZATION_NUMBER']), false);
 });
 
 test('the member list shows the invoice company name when it exists', function () {

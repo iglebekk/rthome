@@ -41,11 +41,11 @@ test('selected locale is used for authenticated layouts and dates', function () 
 test('invoice settings are displayed in Norwegian for Norwegian browser locales', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
-    Member::factory()->for($club)->for($user)->create();
+    $member = Member::factory()->for($club)->for($user)->create();
 
     $this->actingAs($user)
-        ->get(route('clubs.members.create', $club), ['Accept-Language' => 'nb-NO'])
+        ->get(route('clubs.members.edit', [$club, $member]), ['Accept-Language' => 'nb-NO'])
         ->assertSee('Fakturainnstillinger')
         ->assertSee('Bedriftsnavn')
-        ->assertSee('Hent fra Brønnøysundregistrene');
+        ->assertSee('Legg til org nummer');
 });

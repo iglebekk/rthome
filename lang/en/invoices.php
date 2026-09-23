@@ -94,6 +94,7 @@ return [
     ],
     'validation' => [
         'organization_number' => 'A valid club organization number is required before creating invoices.',
+        'invoice_name' => 'The club must have an invoice name fetched from Brreg before creating invoices.',
         'account_number' => 'A valid club account number is required before creating invoices.',
         'recipients_club' => 'All recipients must belong to the club.',
         'products_active' => 'All products must be active products belonging to the club.',

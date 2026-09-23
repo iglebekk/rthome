@@ -22,7 +22,6 @@ class StoreClubRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'organization_number' => ['nullable', 'digits:9'],
             'account_number' => ['nullable', 'digits:11'],
         ];
     }

@@ -45,6 +45,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
     Route::resource('clubs', ClubController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::put('/clubs/{club}/organization-number', [ClubController::class, 'updateOrganizationNumber'])
+        ->name('clubs.organization-number.update');
     Route::get('/clubs/{club}/dashboard', [DashboardController::class, 'show'])->name('clubs.dashboard');
     Route::get('/clubs/{club}/settings/events', [ClubController::class, 'settingsEvents'])->name('clubs.settings.events');
     Route::post('/clubs/{club}/settings/events/import', [ClubController::class, 'importEvents'])->name('clubs.settings.events.import');
@@ -58,6 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         ->middleware('throttle:30,1')
         ->name('clubs.brreg-entities.show');
     Route::resource('clubs.members', MemberController::class)->except('show');
+    Route::put('/clubs/{club}/members/{member}/invoice-details', [MemberController::class, 'updateInvoiceDetails'])
+        ->name('clubs.members.invoice-details.update');
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);
     Route::resource('clubs.links', LinkController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);

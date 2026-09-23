@@ -94,6 +94,7 @@ return [
     ],
     'validation' => [
         'organization_number' => 'Klubben må ha et gyldig organisasjonsnummer før fakturaer kan opprettes.',
+        'invoice_name' => 'Klubben må ha et fakturanavn hentet fra Brreg før fakturaer kan opprettes.',
         'account_number' => 'Klubben må ha et gyldig kontonummer før fakturaer kan opprettes.',
         'recipients_club' => 'Alle mottakere må tilhøre klubben.',
         'products_active' => 'Alle produkter må være aktive og tilhøre klubben.',

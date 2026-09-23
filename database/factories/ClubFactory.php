@@ -20,6 +20,7 @@ class ClubFactory extends Factory
         return [
             'name' => fake()->unique()->company().' Club',
             'organization_number' => null,
+            'invoice_name' => null,
             'account_number' => null,
             'locale' => 'nb',
             'invoice_sequence' => 10000,

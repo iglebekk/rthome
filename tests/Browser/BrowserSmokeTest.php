@@ -126,15 +126,16 @@ test('a member can copy an active invitation link', function () {
 test('a Brreg network failure shows a localized error', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
-    Member::factory()->for($club)->for($user)->create();
+    $member = Member::factory()->for($club)->for($user)->create();
 
     $this->actingAs($user);
 
-    visit(route('clubs.members.create', $club))
+    visit(route('clubs.members.edit', [$club, $member]))
         ->assertScript('window.fetch = () => Promise.reject(new TypeError("Failed to fetch")); true')
-        ->fill('invoice_organization_number', '987654321')
-        ->click(__('members.invoice.lookup'))
-        ->assertSee(__('members.invoice.lookup_unavailable'))
+        ->click(__('members.invoice.organization_number_add'))
+        ->fill('organization_number_preview', '987654321')
+        ->click(__('brreg.modal.fetch'))
+        ->assertSee(__('brreg.lookup_unavailable'))
         ->assertDontSee('Failed to fetch')
         ->assertNoJavaScriptErrors()
         ->assertNoConsoleLogs();

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeleteMemberAction;
+use App\Actions\SyncMemberInvoiceDetailsAction;
 use App\Http\Requests\DestroyMemberRequest;
 use App\Http\Requests\StoreMemberRequest;
+use App\Http\Requests\UpdateMemberInvoiceDetailsRequest;
 use App\Http\Requests\UpdateMemberRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -63,6 +65,21 @@ class MemberController extends Controller
         $memberModel->update($request->validated());
 
         return redirect()->route('clubs.members.index', $clubModel)
+            ->with('status', __('members.messages.updated'));
+    }
+
+    public function updateInvoiceDetails(
+        UpdateMemberInvoiceDetailsRequest $request,
+        SyncMemberInvoiceDetailsAction $syncMemberInvoiceDetails,
+        int $club,
+        int $member,
+    ): RedirectResponse {
+        $clubModel = $request->user()->clubs()->findOrFail($club);
+        $memberModel = $clubModel->members()->findOrFail($member);
+        $syncMemberInvoiceDetails->handle($memberModel, $request->validated('organization_number'));
+
+        return redirect()
+            ->route('clubs.members.edit', [$clubModel, $memberModel])
             ->with('status', __('members.messages.updated'));
     }
 

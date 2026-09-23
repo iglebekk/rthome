@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['club_id', 'invoice_creation_id', 'member_id', 'credited_invoice_id', 'document_type', 'status', 'number', 'invoice_date', 'due_date', 'issued_at', 'paid_at', 'paid_amount_ore', 'club_name', 'club_organization_number', 'club_account_number', 'club_locale', 'recipient_name', 'recipient_company_name', 'recipient_organization_number', 'recipient_address', 'recipient_postal_code', 'recipient_city', 'recipient_email', 'net_total_ore', 'vat_total_ore', 'gross_total_ore'])]
+#[Fillable(['club_id', 'invoice_creation_id', 'member_id', 'credited_invoice_id', 'document_type', 'status', 'number', 'invoice_date', 'due_date', 'issued_at', 'paid_at', 'paid_amount_ore', 'club_organization_number', 'club_account_number', 'club_locale', 'recipient_name', 'recipient_company_name', 'recipient_organization_number', 'recipient_address', 'recipient_postal_code', 'recipient_city', 'recipient_email', 'net_total_ore', 'vat_total_ore', 'gross_total_ore'])]
 class Invoice extends Model
 {
     /** @use HasFactory<InvoiceFactory> */

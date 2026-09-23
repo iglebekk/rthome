@@ -23,6 +23,7 @@ function invoiceClubContext(bool $withOrganizationNumber = true, bool $withAccou
     $user = User::factory()->create();
     $club = Club::factory()->create([
         'organization_number' => $withOrganizationNumber ? '912345678' : null,
+        'invoice_name' => $withOrganizationNumber ? 'Acme AS' : null,
         'account_number' => $withAccountNumber ? '12345678903' : null,
     ]);
     $firstMember = Member::factory()->for($club)->for($user)->create([
@@ -148,6 +149,12 @@ test('invoice creation validates recipients products dates organization number a
         ->assertUnprocessable()
         ->assertJsonValidationErrors('account_number');
 
+    $club->update(['account_number' => '12345678903', 'invoice_name' => null]);
+    $this->actingAs($user)
+        ->postJson(route('clubs.invoice-creations.store', $club), invoiceCreationPayload($member, $product))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('invoice_name');
+
     expect(Invoice::query()->count())->toBe(0);
 });
 
@@ -175,6 +182,20 @@ test('the invoice form shows the account number error after issue validation fai
     $this->followRedirects($response)
         ->assertSuccessful()
         ->assertSee(__('invoices.validation.account_number'));
+});
+
+test('the invoice form shows the invoice name error after issue validation fails', function () {
+    [$user, $club, $member] = invoiceClubContext();
+    $club->update(['invoice_name' => null]);
+    $product = Product::factory()->for($club)->create();
+
+    $response = $this->actingAs($user)
+        ->from(route('clubs.invoice-creations.create', $club))
+        ->post(route('clubs.invoice-creations.store', $club), invoiceCreationPayload($member, $product));
+
+    $this->followRedirects($response)
+        ->assertSuccessful()
+        ->assertSee(__('invoices.validation.invoice_name'));
 });
 
 test('invoice creation rejects cross club recipients and products', function () {
