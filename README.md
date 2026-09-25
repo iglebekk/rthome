@@ -1,58 +1,126 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# RTHome
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+RTHome er en Laravel-applikasjon for drift av frivillige klubber og foreninger. Den samler medlemsregister, verv, arrangementer, delte lenker og fakturering i ett arbeidsrom per klubb.
 
-## About Laravel
+README-en er skrevet for både utviklere og AI-agenter som trenger rask oversikt over domenet, arkitekturen og hvordan prosjektet kjøres lokalt.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Hva applikasjonen gjør
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+En innlogget bruker jobber alltid innenfor en klubbkontekst. Fra klubbens arbeidsrom kan brukeren:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- administrere medlemmer og koble dem til brukerkontoer
+- registrere verv og hvem som fyller dem
+- opprette og importere arrangementer
+- dele nyttige lenker internt i klubben
+- invitere nye medlemmer via token-baserte invitasjoner
+- opprette produkter og bruke dem som grunnlag for fakturering
+- generere, sende, eksportere, kreditere og markere fakturaer som betalt
+- dele offentlige arrangementssider via en egen offentlig token-lenke
 
-## Learning Laravel
+Applikasjonen har også en egen aktiveringsflyt for medlemmer som inviteres inn før de har en brukerkonto.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Viktige brukerflyter
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Innlogging og aktivering
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- Gjester starter med å identifisere e-postadressen sin.
+- Eksisterende brukere går videre til passordsteget.
+- Nye brukere eller inviterte medlemmer kan fullføre registrering eller medlemsaktivering.
+- Etter innlogging sendes brukeren videre til første tilgjengelige klubb, eller til opprettelse av klubb hvis brukeren ikke er medlem noe sted.
 
-## Agentic Development
+### Klubbadministrasjon
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- Hver klubb har egne medlemmer, verv, arrangementer, lenker, produkter og fakturaer.
+- Tilgang er konsekvent avgrenset til klubber brukeren faktisk tilhører.
+- Dashboardet viser blant annet neste arrangement, fylte verv, lenker og medlemstall.
+
+### Fakturering
+
+- Produkter definerer pris, MVA-behandling og beskrivelse.
+- En fakturakjøring velger mottakere og produktlinjer.
+- Utstedte fakturaer kan ikke endres bortsett fra e-poststatus og betalingsstatus.
+- Fakturaer kan eksporteres som nedlastbare batcher, og gamle eksportfiler ryddes via scheduler.
+
+### Offentlige lenker
+
+- `/join/{token}` brukes for klubbinvitasjoner.
+- `/events/{token}` brukes for offentlige arrangementer.
+- Token-baserte offentlige ruter er rate-begrenset.
+
+## Domenemodell
+
+| Entitet | Rolle |
+| --- | --- |
+| `Club` | Hovedaggregat for en klubb eller forening. Eier medlemmer, verv, arrangementer, lenker, produkter og fakturaer. |
+| `Member` | En person i en klubb, med eventuell kobling til en `User`. Har også fakturainformasjon. |
+| `Position` | Et verv i klubben, eventuelt knyttet til et medlem. |
+| `Event` | Et arrangement med tidspunkt, sted og eventuell offentlig deling. |
+| `Link` | En intern lenke som kan festes til dashboardet. |
+| `ClubInvitation` | Invitasjon inn i en klubb via token. |
+| `MemberActivation` | Aktiveringsflyt for inviterte medlemmer som må opprette eller fullføre konto. |
+| `Product` | Fakturerbar vare eller tjeneste med pris og MVA-oppsett. |
+| `InvoiceCreation` | Et utkast eller en utstedt fakturakjøring. |
+| `Invoice` / `InvoiceLine` | Utstedte fakturaer og linjene deres. |
+| `InvoiceExport` | Eksportbatch for nedlasting av flere fakturaer. |
+
+## Teknisk oversikt
+
+- **Backend:** Laravel 13, PHP, Eloquent, Fortify for autentisering
+- **Frontend:** Blade, Flux UI-komponenter, Tailwind CSS v4, Vite
+- **PDF og e-post:** `spatie/laravel-pdf`, `dompdf/dompdf`, Resend-støtte
+- **Testing:** Pest, Laravel test helpers og browser tests
+- **Standard lokal konfigurasjon:** SQLite, database-baserte sessions, cache og queue
+
+## Viktige mapper
+
+- `app/Http/Controllers` – webflyter og CRUD-endepunkter
+- `app/Actions` – domenelogikk som import, invitasjoner, fakturering og synkronisering
+- `app/Models` – sentrale domeneentiteter
+- `resources/views` – Blade-visninger og UI-komponenter
+- `routes/web.php` – alle brukerrettede ruter
+- `tests/Feature` – funksjonell dekning av domene- og sideflyter
+- `tests/Browser` – browser smoke tests
+
+## Lokal utvikling
+
+Prosjektet kjøres lokalt via Laravel Valet på `http://rthome.test`.
+
+### Første oppsett
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer run setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Skriptet installerer PHP- og Node-avhengigheter, oppretter `.env` ved behov, genererer appnøkkel, kjører migreringer og bygger frontend.
 
-## Contributing
+### Daglig arbeid
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer run dev
+```
 
-## Code of Conduct
+Dette starter utviklingsprosessene som prosjektet forventer, inkludert Vite, køarbeider, loggvisning og en intern dev-server. For manuell verifisering skal Valet-URL-en brukes, ikke `php artisan serve`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Nyttige kommandoer
 
-## Security Vulnerabilities
+```bash
+php artisan test --compact
+vendor/bin/pest tests/Feature --compact
+npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Veiledning for AI-agenter
 
-## License
+- Les prosjektreglene i `.ai/rules/` før du gjør endringer.
+- Bruk `routes/web.php` og modellene i `app/Models` som kilde for domeneoversikt.
+- Legg domenelogikk i eksisterende actions når endringer gjelder invitasjoner, import, fakturering eller synkronisering.
+- Hold endringer klubbavgrenset; de fleste sider og handlinger forventer eksplisitt klubbtilhørighet.
+- Bevar eksisterende arbeidsflyter for token-baserte offentlige sider og rate limiting.
+- Bruk eksisterende tester som spesifikasjon før du endrer flyter.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Relaterte filer
+
+- `AGENTS.md` – agentinstrukser for dette repoet
+- `CLAUDE.md` – Claude-spesifikke instruksjoner
+- `GEMINI.md` – Gemini-spesifikke instruksjoner
+- `docs/laravel-prinsipper.md` – generelle Laravel-prinsipper for prosjektet
