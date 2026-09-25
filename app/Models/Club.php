@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Fillable(['name', 'organization_number', 'invoice_name', 'account_number', 'locale', 'invoice_sequence'])]
+#[Fillable(['name', 'organization_number', 'invoice_name', 'account_number', 'locale', 'invoice_sequence', 'public_events_token',
+    'public_events_enabled'])]
 class Club extends Model
 {
     /** @use HasFactory<ClubFactory> */
@@ -70,6 +71,16 @@ class Club extends Model
             'id',
             'user_id',
         );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'public_events_enabled' => 'boolean',
+        ];
     }
 
     protected static function booted(): void

@@ -15,6 +15,8 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicEventController;
+use App\Http\Controllers\PublicEventsLinkController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,6 +28,14 @@ Route::get('/', function () {
 Route::get('/join/{token}', [ClubInvitationController::class, 'show'])
     ->middleware('throttle:30,1')
     ->name('club-invitations.show');
+
+Route::get('/events/{token}', [PublicEventController::class, 'index'])
+    ->middleware('throttle:30,1')
+    ->name('public-events.index');
+Route::get('/events/{token}/{event}', [PublicEventController::class, 'show'])
+    ->whereNumber('event')
+    ->middleware('throttle:30,1')
+    ->name('public-events.show');
 
 Route::middleware('guest')->group(function (): void {
     Route::post('/login/identify', IdentifyAccountController::class)
@@ -64,6 +74,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         ->name('clubs.members.invoice-details.update');
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);
+    Route::post('/clubs/{club}/public-events-link', [PublicEventsLinkController::class, 'store'])
+        ->name('clubs.public-events-link.store');
+    Route::delete('/clubs/{club}/public-events-link', [PublicEventsLinkController::class, 'destroy'])
+        ->name('clubs.public-events-link.destroy');
     Route::resource('clubs.links', LinkController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::resource('clubs.products', ProductController::class);
     Route::resource('clubs.invoice-creations', InvoiceCreationController::class)

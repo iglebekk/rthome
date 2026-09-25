@@ -20,4 +20,22 @@ return [
     'delete_title' => 'Delete :name?',
     'delete_description' => 'This permanently removes the event and its uploaded image.',
     'messages' => ['created' => 'Event created.', 'updated' => 'Event updated.', 'deleted' => 'Event deleted.'],
+    'public_sharing' => [
+        'eyebrow' => 'Upcoming events',
+        'page_title' => ':club events',
+        'public_description' => 'Upcoming events shared by the club.',
+        'view_description' => 'Event details shared by the club.',
+        'empty_upcoming_description' => 'The club has not shared any upcoming events yet.',
+        'actions' => [
+            'enable' => 'Enable sharing',
+            'copy' => 'Copy public link',
+            'copied' => 'Link copied',
+            'open' => 'Open public page',
+            'disable' => 'Disable sharing',
+        ],
+        'messages' => [
+            'enabled' => 'Public event sharing is enabled.',
+            'disabled' => 'Public event sharing is disabled.',
+        ],
+    ],
 ];

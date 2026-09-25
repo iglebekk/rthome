@@ -36,6 +36,9 @@ class EventController extends Controller
 
         return view('events.index', [
             'club' => $clubModel,
+            'publicEventsUrl' => $clubModel->public_events_token === null
+                ? null
+                : route('public-events.index', $clubModel->public_events_token),
             'upcomingEvents' => $clubModel->events()->upcoming()->oldest('starts_at')->paginate(12, ['*'], 'upcoming'),
             'pastEvents' => $clubModel->events()->where('starts_at', '<', now())->latest('starts_at')->paginate(12, ['*'], 'past'),
         ]);

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Club;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Club>
@@ -24,6 +25,16 @@ class ClubFactory extends Factory
             'account_number' => null,
             'locale' => 'nb',
             'invoice_sequence' => 10000,
+            'public_events_token' => null,
+            'public_events_enabled' => false,
         ];
+    }
+
+    public function withPublicEventsSharing(?string $token = null): static
+    {
+        return $this->state(fn (): array => [
+            'public_events_token' => $token ?? Str::random(64),
+            'public_events_enabled' => true,
+        ]);
     }
 }

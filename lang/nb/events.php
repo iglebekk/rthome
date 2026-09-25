@@ -39,4 +39,22 @@ return [
         'updated' => 'Arrangementet er oppdatert.',
         'deleted' => 'Arrangementet er slettet.',
     ],
+    'public_sharing' => [
+        'eyebrow' => 'Kommende arrangementer',
+        'page_title' => 'Arrangementer fra :club',
+        'public_description' => 'Kommende arrangementer delt av klubben.',
+        'view_description' => 'Arrangementsdetaljer delt av klubben.',
+        'empty_upcoming_description' => 'Klubben har ikke delt noen kommende arrangementer ennå.',
+        'actions' => [
+            'enable' => 'Aktiver deling',
+            'copy' => 'Kopier offentlig lenke',
+            'copied' => 'Lenken er kopiert',
+            'open' => 'Åpne offentlig side',
+            'disable' => 'Deaktiver deling',
+        ],
+        'messages' => [
+            'enabled' => 'Offentlig deling av arrangementer er aktivert.',
+            'disabled' => 'Offentlig deling av arrangementer er deaktivert.',
+        ],
+    ],
 ];
