@@ -73,13 +73,13 @@ Applikasjonen har også en egen aktiveringsflyt for medlemmer som inviteres inn 
 
 ## Viktige mapper
 
-- `/home/runner/work/rthome/rthome/app/Http/Controllers` – webflyter og CRUD-endepunkter
-- `/home/runner/work/rthome/rthome/app/Actions` – domenelogikk som import, invitasjoner, fakturering og synkronisering
-- `/home/runner/work/rthome/rthome/app/Models` – sentrale domeneentiteter
-- `/home/runner/work/rthome/rthome/resources/views` – Blade-visninger og UI-komponenter
-- `/home/runner/work/rthome/rthome/routes/web.php` – alle brukerrettede ruter
-- `/home/runner/work/rthome/rthome/tests/Feature` – funksjonell dekning av domene- og sideflyter
-- `/home/runner/work/rthome/rthome/tests/Browser` – browser smoke tests
+- `app/Http/Controllers` – webflyter og CRUD-endepunkter
+- `app/Actions` – domenelogikk som import, invitasjoner, fakturering og synkronisering
+- `app/Models` – sentrale domeneentiteter
+- `resources/views` – Blade-visninger og UI-komponenter
+- `routes/web.php` – alle brukerrettede ruter
+- `tests/Feature` – funksjonell dekning av domene- og sideflyter
+- `tests/Browser` – browser smoke tests
 
 ## Lokal utvikling
 
@@ -112,7 +112,7 @@ npm run build
 ## Veiledning for AI-agenter
 
 - Les prosjektreglene i `.ai/rules/` før du gjør endringer.
-- Bruk `/home/runner/work/rthome/rthome/routes/web.php` og modellene i `/home/runner/work/rthome/rthome/app/Models` som kilde for domeneoversikt.
+- Bruk `routes/web.php` og modellene i `app/Models` som kilde for domeneoversikt.
 - Legg domenelogikk i eksisterende actions når endringer gjelder invitasjoner, import, fakturering eller synkronisering.
 - Hold endringer klubbavgrenset; de fleste sider og handlinger forventer eksplisitt klubbtilhørighet.
 - Bevar eksisterende arbeidsflyter for token-baserte offentlige sider og rate limiting.
