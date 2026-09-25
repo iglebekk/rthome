@@ -30,9 +30,11 @@ Route::get('/join/{token}', [ClubInvitationController::class, 'show'])
     ->name('club-invitations.show');
 
 Route::get('/events/{token}', [PublicEventController::class, 'index'])
+    ->middleware('throttle:30,1')
     ->name('public-events.index');
 Route::get('/events/{token}/{event}', [PublicEventController::class, 'show'])
     ->whereNumber('event')
+    ->middleware('throttle:30,1')
     ->name('public-events.show');
 
 Route::middleware('guest')->group(function (): void {
