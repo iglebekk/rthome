@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Actions\ImportEventsAction;
 use App\Actions\ImportMembersAction;
+use App\Actions\SyncClubInvoiceNameAction;
 use App\Http\Requests\DestroyClubRequest;
 use App\Http\Requests\ImportEventsRequest;
 use App\Http\Requests\ImportMembersRequest;
 use App\Http\Requests\StoreClubRequest;
+use App\Http\Requests\UpdateClubOrganizationNumberRequest;
 use App\Http\Requests\UpdateClubRequest;
 use App\Models\Club;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +33,7 @@ class ClubController extends Controller
     public function store(StoreClubRequest $request): RedirectResponse
     {
         $user = $request->user();
-        $club = Club::query()->create($request->validated());
+        $club = Club::query()->create([...$request->validated(), 'locale' => app()->getLocale()]);
 
         $club->members()->create([
             'user_id' => $user->getKey(),
@@ -89,6 +91,19 @@ class ClubController extends Controller
     {
         $clubModel = $request->user()->clubs()->findOrFail($club);
         $clubModel->update($request->validated());
+
+        return redirect()
+            ->route('clubs.edit', $clubModel)
+            ->with('status', __('clubs.messages.updated'));
+    }
+
+    public function updateOrganizationNumber(
+        UpdateClubOrganizationNumberRequest $request,
+        SyncClubInvoiceNameAction $syncClubInvoiceName,
+        int $club,
+    ): RedirectResponse {
+        $clubModel = $request->user()->clubs()->findOrFail($club);
+        $syncClubInvoiceName->handle($clubModel, $request->validated('organization_number'));
 
         return redirect()
             ->route('clubs.edit', $clubModel)

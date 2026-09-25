@@ -9,13 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Fillable([
-    'name',
-    'organization_number',
-    'invoice_sequence',
-    'public_events_token',
-    'public_events_enabled',
-])]
+#[Fillable(['name', 'organization_number', 'invoice_name', 'account_number', 'locale', 'invoice_sequence', 'public_events_token',
+    'public_events_enabled'])]
 class Club extends Model
 {
     /** @use HasFactory<ClubFactory> */
@@ -59,6 +54,11 @@ class Club extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function invoiceExports(): HasMany
+    {
+        return $this->hasMany(InvoiceExport::class);
     }
 
     public function users(): HasManyThrough

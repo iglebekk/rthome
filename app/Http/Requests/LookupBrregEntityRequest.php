@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Member;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,7 +20,7 @@ class LookupBrregEntityRequest extends FormRequest
 
         $club = $user->clubs()->findOrFail($this->route('club'));
 
-        return $user->can('create', [Member::class, $club]);
+        return $user->can('update', $club);
     }
 
     /**

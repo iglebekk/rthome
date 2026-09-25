@@ -282,73 +282,96 @@ document.addEventListener('input', (event) => {
 
 document.querySelectorAll('[data-invoice-creation]').forEach(updateInvoiceCreation);
 
-const showBrregError = (element, message) => {
-    element.textContent = message;
-    element.hidden = false;
+const resetBrregModal = (root) => {
+    root.querySelector('[data-brreg-panel="input"]').hidden = false;
+    root.querySelector('[data-brreg-panel="confirm"]').hidden = true;
+
+    const error = root.querySelector('[data-brreg-error]');
+    error.hidden = true;
+    error.textContent = '';
+
+    root.querySelector('[data-brreg-organization-number]').value = root.dataset.brregCurrentOrganizationNumber ?? '';
 };
 
+const showBrregModalError = (root, message) => {
+    const error = root.querySelector('[data-brreg-error]');
+    error.textContent = message;
+    error.hidden = false;
+};
+
+document.addEventListener('click', (event) => {
+    const modalTrigger = event.target.closest('[data-modal-trigger]');
+
+    if (modalTrigger) {
+        const root = document.querySelector(`[data-brreg-modal-content="${modalTrigger.dataset.modalTrigger}"]`);
+
+        if (root) {
+            resetBrregModal(root);
+        }
+    }
+
+    const backButton = event.target.closest('[data-brreg-back]');
+
+    if (backButton) {
+        const root = backButton.closest('[data-brreg-modal-content]');
+        root.querySelector('[data-brreg-panel="confirm"]').hidden = true;
+        root.querySelector('[data-brreg-panel="input"]').hidden = false;
+    }
+});
+
 document.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-brreg-lookup]');
+    const button = event.target.closest('[data-brreg-fetch]');
 
     if (! button) {
         return;
     }
 
-    const form = button.closest('form');
-    const organizationNumberInput = form?.querySelector('[data-brreg-organization-number]');
-    const errorElement = form?.querySelector('[data-brreg-error]');
-
-    if (! organizationNumberInput || ! errorElement) {
-        return;
-    }
-
-    errorElement.hidden = true;
-
+    const root = button.closest('[data-brreg-modal-content]');
+    const organizationNumberInput = root.querySelector('[data-brreg-organization-number]');
     const organizationNumber = organizationNumberInput.value.replace(/\s+/g, '');
 
     if (! organizationNumber) {
-        showBrregError(errorElement, button.dataset.brregRequiredMessage);
+        showBrregModalError(root, root.dataset.brregRequiredMessage);
 
         return;
     }
 
+    root.querySelector('[data-brreg-error]').hidden = true;
+
     const originalLabel = button.textContent;
     button.disabled = true;
-    button.textContent = button.dataset.brregLoadingLabel;
+    organizationNumberInput.disabled = true;
+    button.textContent = root.dataset.brregLoadingLabel;
 
     try {
         const response = await fetch(
-            button.dataset.brregLookupUrl.replace('ORGANIZATION_NUMBER', encodeURIComponent(organizationNumber)),
+            root.dataset.brregLookupUrl.replace('ORGANIZATION_NUMBER', encodeURIComponent(organizationNumber)),
             { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
         );
         const body = await response.json();
 
         if (! response.ok) {
-            showBrregError(errorElement, body.message ?? button.dataset.brregUnavailableMessage);
+            showBrregModalError(root, body.message ?? root.dataset.brregUnavailableMessage);
 
             return;
         }
 
-        const fields = Object.entries(body.data);
-        const hasExistingDetails = fields.some(([name]) => form.querySelector(`[name="${name}"]`)?.value);
+        Object.entries(body.data).forEach(([field, value]) => {
+            const target = root.querySelector(`[data-brreg-summary-value="${field}"]`);
 
-        if (hasExistingDetails && ! window.confirm(button.dataset.brregConfirmation)) {
-            return;
-        }
-
-        organizationNumberInput.value = organizationNumber;
-
-        fields.forEach(([name, value]) => {
-            const input = form.querySelector(`[name="${name}"]`);
-
-            if (input) {
-                input.value = value ?? '';
+            if (target) {
+                target.textContent = value ?? '—';
             }
         });
+
+        root.querySelector('[data-brreg-confirm-organization-number]').value = organizationNumber;
+        root.querySelector('[data-brreg-panel="input"]').hidden = true;
+        root.querySelector('[data-brreg-panel="confirm"]').hidden = false;
     } catch {
-        showBrregError(errorElement, button.dataset.brregUnavailableMessage);
+        showBrregModalError(root, root.dataset.brregUnavailableMessage);
     } finally {
         button.disabled = false;
+        organizationNumberInput.disabled = false;
         button.textContent = originalLabel;
     }
 });

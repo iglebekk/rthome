@@ -25,5 +25,5 @@ return [
         'open' => 'Åpne navigasjon',
         'close' => 'Lukk navigasjon',
     ],
-    'actions' => ['save' => 'Lagre endringer', 'cancel' => 'Avbryt', 'delete' => 'Slett', 'back' => 'Gå tilbake', 'continue' => 'Fortsett', 'search' => 'Søk'],
+    'actions' => ['save' => 'Lagre endringer', 'cancel' => 'Avbryt', 'delete' => 'Slett', 'back' => 'Gå tilbake', 'continue' => 'Fortsett', 'search' => 'Søk', 'actions' => 'Handlinger'],
 ];

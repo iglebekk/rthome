@@ -22,13 +22,13 @@ class BrregEntityController extends Controller
             $entity = $lookupBrregEntity->handle($request->string('organization_number')->toString());
         } catch (ConnectionException|RequestException) {
             return response()->json([
-                'message' => __('members.invoice.lookup_unavailable'),
+                'message' => __('brreg.lookup_unavailable'),
             ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         if ($entity === null) {
             return response()->json([
-                'message' => __('members.invoice.lookup_not_found'),
+                'message' => __('brreg.lookup_not_found'),
             ], Response::HTTP_NOT_FOUND);
         }
 

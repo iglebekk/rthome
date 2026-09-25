@@ -90,7 +90,7 @@ test('returns 404 when Brreg cannot find the organization', function () {
     $this->actingAs($user)
         ->getJson(route('clubs.brreg-entities.show', [$club, '987654321']))
         ->assertNotFound()
-        ->assertJsonPath('message', __('members.invoice.lookup_not_found'));
+        ->assertJsonPath('message', __('brreg.lookup_not_found'));
 });
 
 test('returns 503 when Brreg is unavailable', function () {
@@ -103,7 +103,7 @@ test('returns 503 when Brreg is unavailable', function () {
     $this->actingAs($user)
         ->getJson(route('clubs.brreg-entities.show', [$club, '987654321']))
         ->assertServiceUnavailable()
-        ->assertJsonPath('message', __('members.invoice.lookup_unavailable'));
+        ->assertJsonPath('message', __('brreg.lookup_unavailable'));
 });
 
 test('returns 404 when the user does not belong to the club', function () {
@@ -114,4 +114,20 @@ test('returns 404 when the user does not belong to the club', function () {
     $this->actingAs($user)
         ->getJson(route('clubs.brreg-entities.show', [$club, '987654321']))
         ->assertNotFound();
+});
+
+test('a club member can use the lookup for the club itself, without ever having created a member', function () {
+    Http::preventStrayRequests();
+    Http::fake([
+        'https://data.brreg.no/enhetsregisteret/api/enheter/987654321' => Http::response(['navn' => 'Acme AS']),
+    ]);
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    Member::factory()->for($club)->for($user)->create();
+
+    // Documents that authorization is based on club membership (ClubPolicy::update), not on the
+    // ability to create a Member — this endpoint is now also used by the club's own org-number modal.
+    $this->actingAs($user)
+        ->getJson(route('clubs.brreg-entities.show', [$club, '987654321']))
+        ->assertOk();
 });

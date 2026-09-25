@@ -25,6 +25,7 @@ class InvoicePdfService
         Pdf::view('pdfs.invoice', [
             'document' => $this->document($invoice),
         ])
+            ->driver('dompdf')
             ->format('a4')
             ->name($this->filename($invoice))
             ->save($disk->path($path));
@@ -57,6 +58,7 @@ class InvoicePdfService
      *     due_date: string,
      *     seller_name: string,
      *     seller_organization_number: string,
+     *     seller_account_number: string,
      *     recipient_name: string,
      *     recipient_company_name: ?string,
      *     recipient_organization_number: ?string,
@@ -71,15 +73,17 @@ class InvoicePdfService
      */
     public function document(Invoice $invoice): array
     {
-        $lines = $invoice->loadMissing('lines')->lines;
+        $invoice->loadMissing(['lines', 'club']);
+        $lines = $invoice->lines;
 
         return [
             'number' => $invoice->number ?? $invoice->getKey(),
             'document_type' => __('invoices.document_types.'.$this->enumValue($invoice->document_type)),
             'invoice_date' => $this->formatDate($invoice->invoice_date),
             'due_date' => $this->formatDate($invoice->due_date),
-            'seller_name' => (string) $invoice->club_name,
+            'seller_name' => (string) $invoice->club?->invoice_name,
             'seller_organization_number' => (string) $invoice->club_organization_number,
+            'seller_account_number' => (string) ($invoice->club_account_number ?? $invoice->club?->account_number),
             'recipient_name' => (string) $invoice->recipient_name,
             'recipient_company_name' => $invoice->recipient_company_name,
             'recipient_organization_number' => $invoice->recipient_organization_number,

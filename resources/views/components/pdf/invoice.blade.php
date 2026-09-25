@@ -16,25 +16,28 @@
             h2 { color: #5f6872; font-size: 9px; letter-spacing: .12em; margin: 0 0 7px; text-transform: uppercase; }
             p { margin: 2px 0; }
             .muted, .label { color: #69737d; }
-            .header, .parties, .summary { display: flex; justify-content: space-between; }
+            .header, .parties, .summary { display: table; table-layout: fixed; width: 100%; }
             .header { border-bottom: 1.5px solid #1f2937; padding-bottom: 16px; }
-            .seller { max-width: 58%; }
+            .header > div, .party, .payment, .totals { display: table-cell; vertical-align: top; }
+            .seller { width: 58%; }
             .seller-name { font-size: 16px; font-weight: 700; margin-bottom: 5px; }
-            .meta { min-width: 180px; text-align: right; }
+            .meta { text-align: right; width: 42%; }
             .meta p { margin: 3px 0; }
             .meta strong { color: #111827; }
-            .parties { gap: 56px; padding: 25px 0 29px; }
-            .party { flex: 1; }
+            .parties { padding: 25px 0 29px; }
+            .party { width: 50%; }
             .party + .party { border-left: 1px solid #dfe3e6; padding-left: 28px; }
             .party p strong { color: #111827; }
             table { border-collapse: collapse; width: 100%; }
             th { border-bottom: 1.5px solid #1f2937; color: #5f6872; font-size: 8.5px; font-weight: 700; padding: 0 6px 7px; text-align: left; text-transform: uppercase; }
             td { border-bottom: 1px solid #e5e7eb; padding: 9px 6px; vertical-align: top; }
             .number { text-align: right; white-space: nowrap; }
-            .summary { align-items: flex-start; border-top: 1.5px solid #1f2937; gap: 36px; margin-top: 21px; padding-top: 14px; }
-            .payment { flex: 1; }
-            .totals { min-width: 235px; }
-            .total-row { display: flex; justify-content: space-between; gap: 20px; padding: 3px 0; }
+            .summary { border-top: 1.5px solid #1f2937; margin-top: 21px; padding-top: 14px; }
+            .payment { width: 58%; }
+            .totals { padding-left: 36px; width: 42%; }
+            .total-row { display: table; padding: 3px 0; width: 100%; }
+            .total-row > span { display: table-cell; }
+            .total-row > span:last-child { text-align: right; }
             .total-row.final { border-top: 1px solid #cdd2d7; color: #111827; font-size: 15px; font-weight: 700; margin-top: 5px; padding-top: 9px; }
             .footer { border-top: 1px solid #e5e7eb; color: #69737d; margin-top: 38px; padding-top: 10px; }
             @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
@@ -104,6 +107,7 @@
         <div class="summary">
             <div class="payment">
                 <h2>{{ __('invoices.payment') }}</h2>
+                <p>{{ __('invoices.account_number') }}: {{ $document['seller_account_number'] }}</p>
                 <p>{{ __('invoices.due_date') }}: {{ $document['due_date'] }}</p>
                 <p>{{ __('invoices.payment_reference', ['number' => $document['number']]) }}</p>
             </div>

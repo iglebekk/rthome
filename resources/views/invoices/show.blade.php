@@ -95,6 +95,7 @@
                 <x-app.card class="grid gap-4">
                     <div class="grid gap-1">
                         <x-app.heading size="lg">{{ __('invoices.sections.payment') }}</x-app.heading>
+                        <x-app.text size="sm">{{ __('invoices.account_number') }}: {{ $invoice->club_account_number ?? $club->account_number }}</x-app.text>
                         <x-app.text size="sm">{{ __($invoice->paid_at ? 'invoices.payment_recorded' : 'invoices.payment_pending') }}</x-app.text>
                     </div>
                     @if ($invoice->paid_at)

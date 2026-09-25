@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceCreationController;
+use App\Http\Controllers\InvoiceExportDownloadController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PositionController;
@@ -52,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
     Route::resource('clubs', ClubController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::put('/clubs/{club}/organization-number', [ClubController::class, 'updateOrganizationNumber'])
+        ->name('clubs.organization-number.update');
     Route::get('/clubs/{club}/dashboard', [DashboardController::class, 'show'])->name('clubs.dashboard');
     Route::get('/clubs/{club}/settings/events', [ClubController::class, 'settingsEvents'])->name('clubs.settings.events');
     Route::post('/clubs/{club}/settings/events/import', [ClubController::class, 'importEvents'])->name('clubs.settings.events.import');
@@ -65,6 +68,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         ->middleware('throttle:30,1')
         ->name('clubs.brreg-entities.show');
     Route::resource('clubs.members', MemberController::class)->except('show');
+    Route::put('/clubs/{club}/members/{member}/invoice-details', [MemberController::class, 'updateInvoiceDetails'])
+        ->name('clubs.members.invoice-details.update');
     Route::resource('clubs.positions', PositionController::class);
     Route::resource('clubs.events', EventController::class);
     Route::post('/clubs/{club}/public-events-link', [PublicEventsLinkController::class, 'store'])
@@ -77,6 +82,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         ->only(['create', 'store', 'show', 'edit', 'update', 'destroy'])
         ->parameters(['invoice-creations' => 'invoiceCreation']);
     Route::get('/clubs/{club}/invoices', [InvoiceController::class, 'index'])->name('clubs.invoices.index');
+    Route::post('/clubs/{club}/invoices/bulk-send', [InvoiceController::class, 'bulkSend'])->name('clubs.invoices.bulk-send');
+    Route::post('/clubs/{club}/invoices/exports', [InvoiceController::class, 'export'])->name('clubs.invoices.exports.store');
     Route::get('/clubs/{club}/invoices/{invoice}', [InvoiceController::class, 'show'])->name('clubs.invoices.show');
     Route::get('/clubs/{club}/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('clubs.invoices.download');
     Route::post('/clubs/{club}/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('clubs.invoices.send');
@@ -84,3 +91,6 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('/clubs/{club}/invoices/{invoice}/unmark-paid', [InvoiceController::class, 'unmarkPaid'])->name('clubs.invoices.unmark-paid');
     Route::post('/clubs/{club}/invoices/{invoice}/credit', [InvoiceController::class, 'credit'])->name('clubs.invoices.credit');
 });
+
+Route::get('/invoice-exports/{invoiceExport:download_token}/download', InvoiceExportDownloadController::class)
+    ->name('invoice-exports.download');

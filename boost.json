@@ -7,6 +7,9 @@
     "guidelines": true,
     "mcp": true,
     "nightwatch": false,
+    "packages": [
+        "spatie/laravel-pdf"
+    ],
     "sail": false,
     "skills": [
         "infer-conventions",
@@ -14,6 +17,7 @@
         "laravel-best-practices",
         "testing-best-practices",
         "fluxui-development",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "laravel-pdf"
     ]
 }

@@ -29,7 +29,7 @@ class CreditInvoiceAction
                 'invoice_creation_id' => $lockedInvoice->invoice_creation_id, 'member_id' => $lockedInvoice->member_id,
                 'credited_invoice_id' => $lockedInvoice->getKey(), 'document_type' => InvoiceDocumentType::CreditNote,
                 'status' => InvoiceStatus::Issued, 'number' => $number, 'invoice_date' => now()->toDateString(),
-                'due_date' => now()->toDateString(), 'issued_at' => now(), 'club_name' => $lockedInvoice->club_name,
+                'due_date' => now()->toDateString(), 'issued_at' => now(),
                 'club_organization_number' => $lockedInvoice->club_organization_number, 'recipient_name' => $lockedInvoice->recipient_name,
                 'recipient_company_name' => $lockedInvoice->recipient_company_name, 'recipient_organization_number' => $lockedInvoice->recipient_organization_number,
                 'recipient_address' => $lockedInvoice->recipient_address, 'recipient_postal_code' => $lockedInvoice->recipient_postal_code,
