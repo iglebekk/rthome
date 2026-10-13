@@ -107,6 +107,39 @@ test('a member can select invoices and open the bulk email confirmation', functi
         ->assertNoJavaScriptErrors();
 });
 
+test('a member can find and open an invoice from the modal', function () {
+    $user = User::factory()->create();
+    $club = Club::factory()->create();
+    $member = Member::factory()->for($club)->for($user)->create();
+    $invoice = Invoice::factory()->for($club)->for($member)->create(['number' => 12345]);
+
+    $this->actingAs($user);
+
+    visit(route('clubs.invoices.index', $club))
+        ->click(__('invoices.go_to.open'))
+        ->assertScript('document.querySelector(\'dialog[data-modal="go-to-invoice"]\').open')
+        ->assertSee(__('invoices.go_to.number'))
+        ->assertDisabled(__('invoices.go_to.go'))
+        ->fill('input[name="invoiceNumber"]', '12345')
+        ->assertDisabled(__('invoices.go_to.go'))
+        ->waitForText(__('invoices.go_to.found', ['number' => '12345']))
+        ->assertEnabled(__('invoices.go_to.go'))
+        ->click('button[aria-label="Close modal"]')
+        ->assertScript('document.querySelector(\'input[name="invoiceNumber"]\').value === ""')
+        ->click(__('invoices.go_to.open'))
+        ->assertScript('document.querySelector(\'dialog[data-modal="go-to-invoice"]\').open')
+        ->assertScript('! document.querySelector(\'dialog[data-modal="go-to-invoice"]\').innerText.includes("12345")')
+        ->fill('input[name="invoiceNumber"]', '99999')
+        ->assertDisabled(__('invoices.go_to.go'))
+        ->waitForText(__('invoices.go_to.not_found'))
+        ->assertDisabled(__('invoices.go_to.go'))
+        ->fill('input[name="invoiceNumber"]', '12345')
+        ->waitForText(__('invoices.go_to.found', ['number' => '12345']))
+        ->click(__('invoices.go_to.go'))
+        ->assertUrlIs(route('clubs.invoices.show', [$club, $invoice]))
+        ->assertNoJavaScriptErrors();
+});
+
 test('a member can copy an active invitation link', function () {
     $user = User::factory()->create();
     $club = Club::factory()->create();
