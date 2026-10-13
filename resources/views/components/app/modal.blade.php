@@ -1,8 +1,8 @@
 @props(['name', 'title', 'triggerLabel'])
 
-<x-app.button type="button" x-on:click="$flux.modal('{{ $name }}').show()" data-modal-trigger="{{ $name }}" {{ $attributes }}>{{ $triggerLabel }}</x-app.button>
+<x-app.button type="button" x-on:click="$flux.modal('{{ $name }}').show()" data-modal-trigger="{{ $name }}" {{ $attributes->except('wire:close') }}>{{ $triggerLabel }}</x-app.button>
 
-<flux:modal :$name class="w-[min(56rem,calc(100vw-2rem))]" scroll="body">
+<flux:modal :$name class="w-[min(56rem,calc(100vw-2rem))]" scroll="body" {{ $attributes->only('wire:close') }}>
     <x-app.section class="gap-5">
         <x-app.heading size="lg">{{ $title }}</x-app.heading>
         {{ $slot }}
