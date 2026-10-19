@@ -22,6 +22,13 @@ return [
     'zero_total' => 'NOK 0.00',
     'empty' => 'No invoices yet',
     'empty_description' => 'Create the first invoice for one or more members.',
+    'filters' => [
+        'settlement' => 'Settlement',
+        'settlements' => ['all' => 'All invoices', 'outstanding' => 'Outstanding', 'settled' => 'Settled'],
+        'sort' => 'Sort by',
+        'sorts' => ['number' => 'Invoice number', 'due_date' => 'Due date', 'overdue' => 'Overdue first'],
+        'apply' => 'Apply filters',
+    ],
     'draft' => 'Invoice draft',
     'drafts_title' => 'Drafts',
     'drafts_description' => 'Drafts have no invoice number and can be changed before issue.',
@@ -73,7 +80,7 @@ return [
         'search_product' => 'Type a product name',
         'choose_product' => 'Choose product',
     ],
-    'statuses' => ['draft' => 'Draft', 'issued' => 'Issued', 'credited' => 'Credited', 'paid' => 'Paid'],
+    'statuses' => ['draft' => 'Draft', 'issued' => 'Issued', 'credited' => 'Credited', 'paid' => 'Paid', 'partially_paid' => 'Partially paid'],
     'actions' => [
         'create_one' => 'Create invoice',
         'create_many' => 'Create :count invoices',

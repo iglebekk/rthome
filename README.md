@@ -39,6 +39,8 @@ Applikasjonen har også en egen aktiveringsflyt for medlemmer som inviteres inn 
 - Produkter definerer pris, MVA-behandling og beskrivelse.
 - En fakturakjøring velger mottakere og produktlinjer.
 - Utstedte fakturaer kan ikke endres bortsett fra e-poststatus og betalingsstatus.
+- Fakturalisten kan filtreres på alle, utestående eller oppgjorte fakturaer, og sorteres på nummer, forfallsdato eller forfalte først. Filtrene er GET-parametere (`settlement` og `sort`) og fungerer også på JSON-endepunktet.
+- Utestående viser restbeløpet etter delbetaling. Kreditnotaer vises under alle fakturaer, mens krediterte originalfakturaer regnes som oppgjort.
 - Fakturaer kan eksporteres som nedlastbare batcher, og gamle eksportfiler ryddes via scheduler.
 
 ### Offentlige lenker

@@ -6,7 +6,10 @@ use App\Actions\CreditInvoiceAction;
 use App\Actions\MarkInvoicePaidAction;
 use App\Actions\UnmarkInvoicePaidAction;
 use App\Enums\InvoiceCreationStatus;
+use App\Enums\InvoiceDocumentType;
+use App\Enums\InvoiceStatus;
 use App\Http\Requests\CreditInvoiceRequest;
+use App\Http\Requests\InvoiceIndexRequest;
 use App\Http\Requests\MarkInvoicePaidRequest;
 use App\Http\Requests\UnmarkInvoicePaidRequest;
 use App\Jobs\BuildInvoiceExportArchive;
@@ -25,10 +28,44 @@ use Illuminate\View\View;
 
 class InvoiceController extends Controller
 {
-    public function index(Request $request, int $club): JsonResponse|View
+    public function index(InvoiceIndexRequest $request, int $club): JsonResponse|View
     {
         $clubModel = $request->user()->clubs()->findOrFail($club);
-        $invoices = $clubModel->invoices()->with('member')->latest('number')->get();
+        $invoicesQuery = $clubModel->invoices()
+            ->with('member')
+            ->select('invoices.*')
+            ->selectRaw('gross_total_ore - COALESCE(paid_amount_ore, 0) as remaining_amount_ore')
+            ->selectRaw('CASE WHEN paid_amount_ore > 0 AND paid_amount_ore < gross_total_ore THEN 1 ELSE 0 END as is_partially_paid');
+
+        if ($request->settlement() === 'outstanding') {
+            $invoicesQuery
+                ->where('document_type', InvoiceDocumentType::Invoice)
+                ->where('status', InvoiceStatus::Issued)
+                ->where(function ($query): void {
+                    $query->whereNull('paid_amount_ore')
+                        ->orWhereColumn('paid_amount_ore', '<', 'gross_total_ore');
+                });
+        } elseif ($request->settlement() === 'settled') {
+            $invoicesQuery->where(function ($query): void {
+                $query->where(function ($query): void {
+                    $query->where('document_type', InvoiceDocumentType::Invoice)
+                        ->where('status', InvoiceStatus::Issued)
+                        ->whereNotNull('paid_amount_ore')
+                        ->whereColumn('paid_amount_ore', '>=', 'gross_total_ore');
+                })->orWhere('status', InvoiceStatus::Credited);
+            });
+        }
+
+        match ($request->sort()) {
+            'due_date' => $invoicesQuery->orderBy('due_date')->orderByDesc('number'),
+            'overdue' => $invoicesQuery
+                ->orderByRaw('CASE WHEN document_type = ? AND due_date < ? AND (paid_amount_ore IS NULL OR paid_amount_ore < gross_total_ore) AND status = ? THEN 0 ELSE 1 END', [InvoiceDocumentType::Invoice->value, now()->toDateString(), InvoiceStatus::Issued->value])
+                ->orderBy('due_date')
+                ->orderByDesc('number'),
+            default => $invoicesQuery->latest('number'),
+        };
+
+        $invoices = $invoicesQuery->get();
         $drafts = $clubModel->invoiceCreations()
             ->where('status', InvoiceCreationStatus::Draft)
             ->withCount(['recipients', 'lines'])
@@ -37,7 +74,13 @@ class InvoiceController extends Controller
 
         return $request->expectsJson()
             ? response()->json(['data' => $invoices, 'drafts' => $drafts])
-            : view('invoices.index', ['club' => $clubModel, 'invoices' => $invoices, 'drafts' => $drafts]);
+            : view('invoices.index', [
+                'club' => $clubModel,
+                'invoices' => $invoices,
+                'drafts' => $drafts,
+                'settlement' => $request->settlement(),
+                'sort' => $request->sort(),
+            ]);
     }
 
     public function show(Request $request, int $club, int $invoice): JsonResponse|View
