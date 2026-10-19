@@ -1,4 +1,4 @@
-@props(['club', 'invoices', 'showSend' => false])
+@props(['club', 'invoices', 'settlement' => 'all', 'showSend' => false])
 
 <div x-data="{ selected: [] }" class="grid gap-5" data-test="invoice-bulk-actions">
     @if ($invoices->isNotEmpty())
@@ -44,8 +44,8 @@
                     data-test="invoice-select-{{ $invoice->getKey() }}"
                 />
                 <div class="grid gap-2">
-                <div class="flex flex-wrap items-center gap-2"><x-app.heading>{{ $invoice->number ?? __('invoices.invoice') }}</x-app.heading><x-app.badge>{{ __('invoices.statuses.'.($invoice->status?->value ?? $invoice->status ?? 'issued')) }}</x-app.badge>@if ($invoice->paid_at)<x-app.badge color="emerald">{{ __('invoices.statuses.paid') }}</x-app.badge>@endif</div>
-                <x-app.text size="sm">{{ $invoice->recipient_name ?? $invoice->member?->name }} · {{ number_format(($invoice->gross_total_ore ?? 0) / 100, 2, '.', ' ') }}</x-app.text>
+                <div class="flex flex-wrap items-center gap-2"><x-app.heading>{{ $invoice->number ?? __('invoices.invoice') }}</x-app.heading><x-app.badge>{{ __('invoices.statuses.'.($invoice->status?->value ?? $invoice->status ?? 'issued')) }}</x-app.badge>@if ($invoice->is_partially_paid)<x-app.badge color="amber">{{ __('invoices.statuses.partially_paid') }}</x-app.badge>@elseif ($invoice->paid_at)<x-app.badge color="emerald">{{ __('invoices.statuses.paid') }}</x-app.badge>@endif</div>
+                <x-app.text size="sm">{{ $invoice->recipient_name ?? $invoice->member?->name }} · {{ number_format(($settlement === 'outstanding' ? $invoice->remaining_amount_ore : $invoice->gross_total_ore) / 100, 2, '.', ' ') }}</x-app.text>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">

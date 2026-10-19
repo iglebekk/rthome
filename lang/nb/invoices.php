@@ -22,6 +22,13 @@ return [
     'zero_total' => 'kr 0,00',
     'empty' => 'Ingen fakturaer ennå',
     'empty_description' => 'Opprett den første fakturaen til ett eller flere medlemmer.',
+    'filters' => [
+        'settlement' => 'Oppgjør',
+        'settlements' => ['all' => 'Alle fakturaer', 'outstanding' => 'Utestående', 'settled' => 'Oppgjort'],
+        'sort' => 'Sorter etter',
+        'sorts' => ['number' => 'Fakturanummer', 'due_date' => 'Forfallsdato', 'overdue' => 'Forfalte først'],
+        'apply' => 'Bruk filtre',
+    ],
     'draft' => 'Fakturautkast',
     'drafts_title' => 'Utkast',
     'drafts_description' => 'Utkast har ikke fakturanummer og kan endres før utstedelse.',
@@ -73,7 +80,7 @@ return [
         'search_product' => 'Skriv inn produktnavn',
         'choose_product' => 'Velg produkt',
     ],
-    'statuses' => ['draft' => 'Utkast', 'issued' => 'Utstedt', 'credited' => 'Kreditert', 'paid' => 'Betalt'],
+    'statuses' => ['draft' => 'Utkast', 'issued' => 'Utstedt', 'credited' => 'Kreditert', 'paid' => 'Betalt', 'partially_paid' => 'Delvis betalt'],
     'actions' => [
         'create_one' => 'Opprett faktura',
         'create_many' => 'Opprett :count fakturaer',

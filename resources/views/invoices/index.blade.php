@@ -6,5 +6,10 @@
         </x-slot:actions>
     </x-app.page-header>
     <x-invoice-creations.list :$club :$drafts />
-    <x-invoices.list :$club :$invoices />
+    <x-form :action="route('clubs.invoices.index', $club)" method="GET" class="sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <x-form.select name="settlement" :label="__('invoices.filters.settlement')" :options="__('invoices.filters.settlements')" :value="$settlement" />
+        <x-form.select name="sort" :label="__('invoices.filters.sort')" :options="__('invoices.filters.sorts')" :value="$sort" />
+        <x-app.button type="submit">{{ __('invoices.filters.apply') }}</x-app.button>
+    </x-form>
+    <x-invoices.list :$club :$invoices :$settlement />
 </x-layouts.app>
